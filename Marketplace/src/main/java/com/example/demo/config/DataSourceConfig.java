@@ -3,28 +3,53 @@ package com.example.demo.config;
 import javax.sql.DataSource;
 
 import org.flywaydb.core.Flyway;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+import org.springframework.jdbc.core.JdbcTemplate;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @Configuration
 public class DataSourceConfig {
 
 	@Bean
-	public DataSource dataSource(@Value("${spring.datasource.driverClassName}") String driverClassName, 
-								 @Value("${spring.datasource.url}") String url,
-								 @Value("${spring.datasource.username}") String username,
-								 @Value("${spring.datasource.password}") String password) {
+	public Path imgDirectory() {
+		return Paths.get("img");
+	}
+	@Bean
+	public JdbcTemplate jdbcTemplate(DataSource dataSource) {
+		return new JdbcTemplate(dataSource);
+	}
+
+	@Bean
+	@ConfigurationProperties("pg")
+	@Profile("prod")
+	public DbProperties pgProperties() {
+		return new DbProperties();
+	}
+
+	@Bean
+	@ConfigurationProperties("h2")
+	@Profile("test")
+	public DbProperties h2Properties() {
+		return new DbProperties();
+	}
+
+	@Bean
+	public DataSource dataSource(DbProperties props) {
 		return DataSourceBuilder
 				.create()
-				.driverClassName(driverClassName)
-				.url(url)
-				.username(username)
-				.password(password)
+				.driverClassName(props.getDriverClassName())
+				.url(props.getUrl())
+				.username(props.getUsername())
+				.password(props.getPassword())
 				.build();
 	}
-	
+
 	@Bean
 	public Flyway flyway(DataSource dataSource) {
 		Flyway flyway = Flyway

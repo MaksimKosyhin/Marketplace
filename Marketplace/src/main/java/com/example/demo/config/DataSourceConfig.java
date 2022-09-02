@@ -20,23 +20,19 @@ public class DataSourceConfig {
 	public Path imgDirectory() {
 		return Paths.get("img");
 	}
+
 	@Bean
 	public JdbcTemplate jdbcTemplate(DataSource dataSource) {
 		return new JdbcTemplate(dataSource);
 	}
 
-	@Bean
-	@ConfigurationProperties("pg")
-	@Profile("prod")
-	public DbProperties pgProperties() {
-		return new DbProperties();
-	}
-
-	@Bean
-	@ConfigurationProperties("h2")
-	@Profile("test")
-	public DbProperties h2Properties() {
-		return new DbProperties();
+	@Bean DbProperties dbProperties() {
+		DbProperties props = new DbProperties();
+		props.setDriverClassName("org.postgresql.Driver");
+		props.setUrl("jdbc:postgresql://localhost:5432/marketplace");
+		props.setUsername("postgres");
+		props.setPassword("pass");
+		return props;
 	}
 
 	@Bean

@@ -21,13 +21,9 @@ public class ProductQuery {
         return this.categoryId;
     }
 
-//    public String getCharacteristics() {
-//        String characteristics = this.characteristics.toString();
-//        return  characteristics.substring(1, characteristics.length() - 1);
-//    }
-
-    public List<Long> getCharacteristics() {
-        return this.characteristics;
+    public String getCharacteristics() {
+        String characteristics = this.characteristics.toString();
+        return  characteristics.substring(1, characteristics.length() - 1);
     }
 
     public String getOrderBy() {

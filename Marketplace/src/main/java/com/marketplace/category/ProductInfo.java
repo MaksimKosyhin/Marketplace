@@ -14,6 +14,5 @@ public class ProductInfo {
     private String imgLocation;
     private int minPrice;
     private int maxPrice;
-    private int averageScore;
     private int totalReviews;
 }

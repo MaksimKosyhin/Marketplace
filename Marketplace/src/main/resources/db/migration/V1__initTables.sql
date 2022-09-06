@@ -70,7 +70,7 @@ CREATE TABLE users
   (
      user_id  INT GENERATED always AS IDENTITY,
      username VARCHAR(90) NOT NULL,
-     PASSWORD TEXT NOT NULL,
+     password TEXT NOT NULL,
      PRIMARY KEY(user_id)
   );
 

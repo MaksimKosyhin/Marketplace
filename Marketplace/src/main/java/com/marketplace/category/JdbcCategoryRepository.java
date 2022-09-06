@@ -51,7 +51,6 @@ public class JdbcCategoryRepository implements  CategoryRepository{
                     "img_location, " +
                     "MIN(price) AS min_price, " +
                     "MAX(price) AS max_price, " +
-                    "AVG(score) AS average_score, " +
                     "SUM(reviews) AS total_reviews " +
                 "FROM products " +
                 "INNER JOIN (" +

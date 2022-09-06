@@ -26,13 +26,16 @@ public class DataSourceConfig {
 		return new JdbcTemplate(dataSource);
 	}
 
-	@Bean DbProperties dbProperties() {
-		DbProperties props = new DbProperties();
-		props.setDriverClassName("org.postgresql.Driver");
-		props.setUrl("jdbc:postgresql://localhost:5432/marketplace");
-		props.setUsername("postgres");
-		props.setPassword("pass");
-		return props;
+	@Bean
+	public Flyway flyway(DataSource dataSource) {
+		Flyway flyway = Flyway
+				.configure()
+				.dataSource(dataSource)
+				.load();
+
+		flyway.migrate();
+
+		return flyway;
 	}
 
 	@Bean
@@ -47,14 +50,7 @@ public class DataSourceConfig {
 	}
 
 	@Bean
-	public Flyway flyway(DataSource dataSource) {
-		Flyway flyway = Flyway
-				.configure()
-				.dataSource(dataSource)
-				.load();
-		
-		flyway.migrate();
-		
-		return flyway;
+	public DbProperties dbProperties() {
+		return new DbProperties();
 	}
 }

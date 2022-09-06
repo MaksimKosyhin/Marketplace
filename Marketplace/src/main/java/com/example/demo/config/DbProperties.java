@@ -8,7 +8,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @NoArgsConstructor
 @Getter
 @Setter
-@ConfigurationProperties("user.datasource")
+@ConfigurationProperties("spring.datasource")
 public class DbProperties {
     private String driverClassName;
     private String url;

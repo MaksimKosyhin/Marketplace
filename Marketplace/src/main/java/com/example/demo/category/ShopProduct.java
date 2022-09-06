@@ -1,16 +1,17 @@
 package com.example.demo.category;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode
+@ToString
 public class ShopProduct {
+    private long shopId;
     private long productId;
-    private String name;
-    private String imgLocation;
-    private long minPrice;
-    private long maxPrice;
+    private long score;
+    private long price;
+    private long reviews;
 }

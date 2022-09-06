@@ -5,6 +5,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 
+import java.util.Collections;
 import java.util.List;
 
 public class JdbcCategoryRepository implements  CategoryRepository{
@@ -47,7 +48,8 @@ public class JdbcCategoryRepository implements  CategoryRepository{
         String queryProductCharacteristics =
                 "SELECT product_id " +
                 "FROM product_characteristics " +
-                "WHERE characteristic_id IN(" + productQuery.getCharacteristics() + ")";
+                "WHERE characteristic_id IN(" + productQuery
+                        .getCharacteristicsInsertParametersTemplate() + ")";
 
         String queryProduct =
                 "SELECT " +
@@ -68,13 +70,11 @@ public class JdbcCategoryRepository implements  CategoryRepository{
                     "AND category_id = ? " +
                     "AND product_id BETWEEN ? AND ? " +
                 "GROUP BY product_id " +
-                "ORDER BY " + productQuery.getOrderBy();
+                productQuery.getOrderBy().getSql();
 
         return jdbcTemplate.query(queryProduct,
                 new BeanPropertyRowMapper<ProductInfo>(ProductInfo.class),
-                productQuery.getCategoryId(),
-                productQuery.getStartId(),
-                productQuery.getEndId());
+                productQuery.getQueryParameters());
     }
 
     @Override

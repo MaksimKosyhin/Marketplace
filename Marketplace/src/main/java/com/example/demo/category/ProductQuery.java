@@ -1,15 +1,17 @@
 package com.example.demo.category;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class ProductQuery {
     private long categoryId;
     private List<Long> characteristics;
-    private String orderBy;
+    private OrderBy orderBy;
     long startId;
     long endId;
 
-    public ProductQuery(long categoryId, List<Long> characteristics, String orderBy, long startId, long endId) {
+    public ProductQuery(long categoryId, List<Long> characteristics, OrderBy orderBy, long startId, long endId) {
         this.categoryId = categoryId;
         this.characteristics = characteristics;
         this.orderBy = orderBy;
@@ -17,24 +19,20 @@ public class ProductQuery {
         this.endId = endId;
     }
 
-    public long getCategoryId() {
-        return this.categoryId;
+    public OrderBy getOrderBy() {
+        return orderBy;
     }
 
-    public String getCharacteristics() {
-        String characteristics = this.characteristics.toString();
-        return  characteristics.substring(1, characteristics.length() - 1);
+    public String getCharacteristicsInsertParametersTemplate() {
+        return String.join(",", Collections.nCopies(characteristics.size(), "?"));
     }
 
-    public String getOrderBy() {
-        return this.orderBy;
-    }
+    public Object[] getQueryParameters() {
+        List<Object> parameters = new ArrayList<>(characteristics);
+        parameters.add(categoryId);
+        parameters.add(startId);
+        parameters.add(endId);
 
-    public long getStartId() {
-        return this.startId;
-    }
-
-    public long getEndId() {
-        return this.endId;
+        return  parameters.toArray();
     }
 }

@@ -430,6 +430,6 @@ class JdbcCategoryRepositoryTest {
     @Test
     public void getProducts() {
         categoryRepository.getProducts(
-                new ProductQuery(-1, List.of(-1L, -2L), "total_reviews DESC ", -1, -2));
+                new ProductQuery(-1, List.of(-1L, -2L), OrderBy.PRICE_ASC, -1, -2));
     }
 }

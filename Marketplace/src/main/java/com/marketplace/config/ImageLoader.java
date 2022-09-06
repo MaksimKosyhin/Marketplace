@@ -1,4 +1,4 @@
-package com.example.demo.config;
+package com.marketplace.config;
 
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Component;

@@ -1,4 +1,4 @@
-package com.example.demo.category;
+package com.marketplace.category;
 
 import java.util.List;
 

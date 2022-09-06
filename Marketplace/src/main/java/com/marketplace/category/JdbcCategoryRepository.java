@@ -1,9 +1,8 @@
-package com.example.demo.category;
+package com.marketplace.category;
 
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
@@ -14,6 +13,16 @@ public class JdbcCategoryRepository implements  CategoryRepository{
 
     public JdbcCategoryRepository(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
+    }
+
+    private String getParametersTemplate(int numberOfParameters) {
+        return String.join(",", Collections.nCopies(numberOfParameters, "?"));
+    }
+
+    private String getOrderByStatement(ProductQuery productQuery) {
+        return "ORDER BY " +
+                productQuery.getSortingOption().getColumnName() +
+                (productQuery.isOrderDescending() ? " DESC " : " ASC ");
     }
 
     @Override
@@ -35,44 +44,42 @@ public class JdbcCategoryRepository implements  CategoryRepository{
 
     @Override
     public List<ProductInfo> getProducts(ProductQuery productQuery) {
-        String queryShops =
-                "SELECT shop_id FROM shops WHERE removed = FALSE";
-
-        String queryPrices =
-                "SELECT product_id, score, price, reviews " +
-                "FROM shop_products " +
-                "INNER JOIN (" + queryShops + ") shops " +
-                        "USING(shop_id) " +
-                "WHERE removed = FALSE";
-
-        String queryProductCharacteristics =
-                "SELECT product_id " +
-                "FROM product_characteristics " +
-                "WHERE characteristic_id IN(" + productQuery
-                        .getCharacteristicsInsertParametersTemplate() + ")";
-
-        String queryProduct =
+        String queryProducts =
                 "SELECT " +
                     "product_id, " +
                     "name, " +
                     "img_location, " +
                     "MIN(price) AS min_price, " +
                     "MAX(price) AS max_price, " +
-                    "AVG(prices.score) AS average_score, " +
+                    "AVG(score) AS average_score, " +
                     "SUM(reviews) AS total_reviews " +
                 "FROM products " +
-                "INNER JOIN (" + queryPrices + ") prices " +
+                "INNER JOIN (" +
+                        "SELECT product_id, score, price, reviews " +
+                        "FROM shop_products " +
+                        "INNER JOIN (" +
+                                "SELECT shop_id " +
+                                "FROM shops " +
+                                "WHERE removed = FALSE) shops " +
+                            "USING(shop_id) " +
+                        "WHERE removed = FALSE) shop_values " +
                     "USING(product_id) " +
-                "INNER JOIN (" + queryProductCharacteristics + ") characteristics " +
+                "INNER JOIN (" +
+                        "SELECT product_id " +
+                        "FROM product_characteristics " +
+                        "WHERE characteristic_id " +
+                            "IN(" + getParametersTemplate
+                                (productQuery.getNumberOfCharacteristics()) + ")) characteristics " +
                     "USING(product_id) " +
                 "WHERE " +
                     "removed = FALSE " +
                     "AND category_id = ? " +
-                    "AND product_id BETWEEN ? AND ? " +
+                    "AND product_id > ? " +
                 "GROUP BY product_id " +
-                productQuery.getOrderBy().getSql();
+                getOrderByStatement(productQuery) +
+                "LIMIT ?";
 
-        return jdbcTemplate.query(queryProduct,
+        return jdbcTemplate.query(queryProducts,
                 new BeanPropertyRowMapper<ProductInfo>(ProductInfo.class),
                 productQuery.getQueryParameters());
     }
@@ -108,6 +115,7 @@ public class JdbcCategoryRepository implements  CategoryRepository{
     }
 
     @Override
+    @Transactional
     public void removeCategory(long categoryId) {
         String removeCategory = "UPDATE categories SET removed = TRUE WHERE category_id = ?";
         jdbcTemplate.update(removeCategory, categoryId);

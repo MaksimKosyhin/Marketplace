@@ -2,15 +2,15 @@ package com.example.demo.category;
 
 import lombok.*;
 
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Setter
 @EqualsAndHashCode
 @ToString
-public class Characteristic {
-    private Long characteristicId;
+public class Category {
     private Long categoryId;
     private String name;
-    private String characteristicValue;
+    private Long parentId;
+    private String imgLocation;
 }

@@ -1,4 +1,4 @@
-package com.example.demo.config;
+package com.marketplace.config;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

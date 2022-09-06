@@ -1,5 +1,6 @@
-package com.example.demo.category;
+package com.marketplace.category;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -290,10 +291,10 @@ class JdbcCategoryRepositoryTest {
         addCharacteristicForTest(size);
 
         //then
-        assertThat(categoryRepository.getCharacteristics(laptops.getCategoryId()))
+        Assertions.assertThat(categoryRepository.getCharacteristics(laptops.getCategoryId()))
                 .isEqualTo(List.of(diagonal, operativeMemory));
 
-        assertThat(categoryRepository.getCharacteristics(pants.getCategoryId()))
+        Assertions.assertThat(categoryRepository.getCharacteristics(pants.getCategoryId()))
                 .isEqualTo(List.of(size));
     }
 
@@ -428,8 +429,16 @@ class JdbcCategoryRepositoryTest {
     }
 
     @Test
-    public void getProducts() {
+    public void getProductsExecutes() {
         categoryRepository.getProducts(
-                new ProductQuery(-1, List.of(-1L, -2L), OrderBy.PRICE_ASC, -1, -2));
+                new ProductQuery(-1,
+                        new long[] {-1, -2},
+                        SortingOption.PRICE,
+                        -1,
+                        0,
+                        true
+                ));
     }
+
+
 }

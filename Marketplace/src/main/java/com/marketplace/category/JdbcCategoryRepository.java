@@ -27,6 +27,16 @@ public class JdbcCategoryRepository implements  CategoryRepository{
                 (productQuery.isOrderDescending() ? " DESC " : " ASC ");
     }
 
+    private long getLastCategoryId() {
+        return jdbcTemplate
+                .queryForObject("SELECT MAX(category_id) FROM categories", Long.class);
+    }
+
+    private long getLastCharacteristicId() {
+        return jdbcTemplate
+                .queryForObject("SELECT MAX(characteristic_id) FROM characteristics", Long.class);
+    }
+
     @Override
     public boolean isParentCategory(long categoryId) {
         String sql = "SELECT EXISTS(SELECT 1 FROM categories WHERE parent_id = ?)";
@@ -86,15 +96,17 @@ public class JdbcCategoryRepository implements  CategoryRepository{
     }
 
     @Override
-    public void addCategory(Category category) {
+    public long addCategory(Category category) {
         String sql = "INSERT INTO categories (name, parent_id, img_location) " +
                 "VALUES (?, ?, ?)";
         jdbcTemplate.update(sql,
                 category.getName(), category.getParentId(), category.getImgLocation());
+
+        return  getLastCategoryId();
     }
 
     @Override
-    public void addCharacteristic(Characteristic characteristic) {
+    public long addCharacteristic(Characteristic characteristic) {
         String sql = "INSERT INTO characteristics (category_id, name, characteristic_value) " +
                 "VALUES (?, ?, ?)";
 
@@ -102,6 +114,8 @@ public class JdbcCategoryRepository implements  CategoryRepository{
                 characteristic.getCategoryId(),
                 characteristic.getName(),
                 characteristic.getCharacteristicValue());
+
+        return  getLastCharacteristicId();
     }
 
     @Override
@@ -117,7 +131,7 @@ public class JdbcCategoryRepository implements  CategoryRepository{
 
     @Override
     @Transactional
-    public void removeCategory(long categoryId) {
+    public boolean removeCategory(long categoryId) {
         String removeCategory = "UPDATE categories SET removed = TRUE WHERE category_id = ?";
         jdbcTemplate.update(removeCategory, categoryId);
 
@@ -127,5 +141,7 @@ public class JdbcCategoryRepository implements  CategoryRepository{
         String removeShopProducts = "UPDATE shop_products SET removed = TRUE WHERE product_id IN " +
                 "(SELECT product_id FROM products WHERE removed = TRUE)";
         jdbcTemplate.update(removeShopProducts);
+
+        return true;
     }
 }

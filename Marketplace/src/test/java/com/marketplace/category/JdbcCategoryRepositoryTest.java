@@ -92,6 +92,11 @@ class JdbcCategoryRepositoryTest {
                 Long.class));
     }
 
+    private void addProductCharacteristicForTest(long productId, long characteristicId) {
+        jdbcTemplate.update("INSERT INTO product_characteristics(product_id, characteristic_id) " +
+                "VALUES(?, ?)", productId, characteristicId);
+    }
+
     private void addShopForTest(String name) {
         String sql = "INSERT INTO shops(name, link, img_location) " +
                 "VALUES(?, '', '')";
@@ -133,29 +138,42 @@ class JdbcCategoryRepositoryTest {
     }
 
     @Test
-    void isParentCategory() {
+    void isNotParentCategoryWithoutSubcategories() {
         //given
-        Category electronics = new Category(
+        Category category = new Category(
                 -1L,
                 "electronics",
                 null,
                 "dir1");
-        addCategoryForTest(electronics);
-
-        Category laptops = new Category(
-                -1L,
-                "laptops",
-                electronics.getCategoryId(),
-                "dir2");
-        addCategoryForTest(laptops);
+        addCategoryForTest(category);
 
         //then
-        assertThat(categoryRepository.isParentCategory(electronics.getCategoryId())).isTrue();
-        assertThat(categoryRepository.isParentCategory(laptops.getCategoryId())).isFalse();
+        assertThat(categoryRepository.isParentCategory(category.getCategoryId())).isFalse();
     }
 
     @Test
-    void getCategories() {
+    void isParentCategoryIfHasSubcategories() {
+        //given
+        Category parent = new Category(
+                -1L,
+                "electronics",
+                null,
+                "dir1");
+        addCategoryForTest(parent);
+
+        Category child = new Category(
+                -1L,
+                "laptops",
+                parent.getCategoryId(),
+                "dir2");
+        addCategoryForTest(child);
+
+        //then
+        assertThat(categoryRepository.isParentCategory(parent.getCategoryId())).isTrue();
+    }
+
+    @Test
+    void returnsSubcategoriesOfParentCategory() {
         //given
         Category electronics = new Category(
                 -1L,
@@ -196,7 +214,7 @@ class JdbcCategoryRepositoryTest {
     }
 
     @Test
-    void addCategory() {
+    void addsCategory() {
         //given
         Category category = new Category(
                 -1L,
@@ -217,7 +235,7 @@ class JdbcCategoryRepositoryTest {
     }
 
     @Test
-    void addCharacteristic() {
+    void addsCharacteristic() {
         //given
         Category laptops = new Category(
                 -1L,
@@ -248,7 +266,7 @@ class JdbcCategoryRepositoryTest {
     }
 
     @Test
-    void getCharacteristics() {
+    void returnsCharacteristicsOfAllProductsInCategory() {
         //given
         Category laptops = new Category(
                 -1L,
@@ -293,13 +311,28 @@ class JdbcCategoryRepositoryTest {
         //then
         Assertions.assertThat(categoryRepository.getCharacteristics(laptops.getCategoryId()))
                 .isEqualTo(List.of(diagonal, operativeMemory));
-
-        Assertions.assertThat(categoryRepository.getCharacteristics(pants.getCategoryId()))
-                .isEqualTo(List.of(size));
     }
 
     @Test
-    void removeCategoryRemovesCategory() {
+    void removesCategory() {
+        //given
+        Category laptops = new Category(
+                -1L,
+                "laptops",
+                null,
+                "dir1"
+        );
+        addCategoryForTest(laptops);
+
+        //when
+        categoryRepository.removeCategory(laptops.getCategoryId());
+
+        //then
+        assertThat(isCategoryRemoved(laptops.getCategoryId())).isTrue();
+    }
+
+    @Test
+    void removesOnlyChosenCategory() {
         //given
         Category laptops = new Category(
                 -1L,
@@ -326,7 +359,31 @@ class JdbcCategoryRepositoryTest {
     }
 
     @Test
-    void removeCategoryOnlyRemovesShopProductsOfRemovedCategory() {
+    void removesProductsOfRemovedCategory() {
+        //given
+        Category laptops = new Category(
+                -1L,
+                "laptops",
+                null,
+                "dir1"
+        );
+        addCategoryForTest(laptops);
+
+        addProductForTest("laptopA", laptops.getCategoryId());
+        long laptopA = queryLastProductId();
+        addProductForTest("laptopB", laptops.getCategoryId());
+        long laptopB = queryLastProductId();
+
+        //when
+        categoryRepository.removeCategory(laptops.getCategoryId());
+
+        //then
+        assertThat(isProductRemoved(laptopA)).isTrue();
+        assertThat(isProductRemoved(laptopB)).isTrue();
+    }
+
+    @Test
+    void removesOnlyShopProductsOfRemovedCategory() {
         //given
         Category laptops = new Category(
                 -1L,
@@ -387,13 +444,56 @@ class JdbcCategoryRepositoryTest {
         categoryRepository.removeCategory(laptops.getCategoryId());
 
         //then
-        assertThat(isShopProductRemoved(shopForLaptops, laptopA)).isTrue();
-        assertThat(isShopProductRemoved(shopForLaptops, laptopB)).isTrue();
         assertThat(isShopProductRemoved(shopForTablets, tabletC)).isFalse();
     }
 
     @Test
-    void removeCategoryOnlyRemovesProductsOfRemovedCategory() {
+    void removesShopProductsOfRemovedCategory() {
+        //given
+        Category laptops = new Category(
+                -1L,
+                "laptops",
+                null,
+                "dir1"
+        );
+        addCategoryForTest(laptops);
+
+        addProductForTest("laptopA", laptops.getCategoryId());
+        long laptopA = queryLastProductId();
+        addProductForTest("laptopB", laptops.getCategoryId());
+        long laptopB = queryLastProductId();
+
+        addShopForTest("shop for laptops");
+        long shopForLaptops = queryLastShopId();
+
+        ShopProduct shopForLaptopA = new ShopProduct(
+                shopForLaptops,
+                laptopA,
+                -1,
+                -1,
+                -1
+        );
+        addShopProductForTest(shopForLaptopA);
+
+        ShopProduct shopForLaptopB = new ShopProduct(
+                shopForLaptops,
+                laptopB,
+                -1,
+                -1,
+                -1
+        );
+        addShopProductForTest(shopForLaptopB);
+
+        //when
+        categoryRepository.removeCategory(laptops.getCategoryId());
+
+        //then
+        assertThat(isShopProductRemoved(shopForLaptops, laptopA)).isTrue();
+        assertThat(isShopProductRemoved(shopForLaptops, laptopB)).isTrue();
+    }
+
+    @Test
+    void removesOnlyProductsOfRemovedCategory() {
         //given
         Category laptops = new Category(
                 -1L,
@@ -423,8 +523,6 @@ class JdbcCategoryRepositoryTest {
         categoryRepository.removeCategory(laptops.getCategoryId());
 
         //then
-        assertThat(isProductRemoved(laptopA)).isTrue();
-        assertThat(isProductRemoved(laptopB)).isTrue();
         assertThat(isProductRemoved(tabletC)).isFalse();
     }
 
@@ -440,5 +538,71 @@ class JdbcCategoryRepositoryTest {
                 ));
     }
 
+    @Test
+    void returnsProductsOfCategory() {
+        Category laptops = new Category(
+                -1L,
+                "laptops",
+                null,
+                "dir1"
+        );
+        addCategoryForTest(laptops);
 
+        addProductForTest("laptopA", laptops.getCategoryId());
+        long laptopA = queryLastProductId();
+
+        addShopForTest("first shop for laptops");
+        long firstShopForLaptops = queryLastShopId();
+        addShopForTest("second shop for laptops");
+        long secondShopForLaptops = queryLastShopId();
+
+        ShopProduct firstShopForLaptopA = new ShopProduct(
+                firstShopForLaptops,
+                laptopA,
+                5,
+                10,
+                15
+        );
+        addShopProductForTest(firstShopForLaptopA);
+
+        ShopProduct secondShopForLaptopA = new ShopProduct(
+                secondShopForLaptops,
+                laptopA,
+                4,
+                12,
+                9
+        );
+        addShopProductForTest(secondShopForLaptopA);
+
+        Characteristic color = new Characteristic(
+                -1L,
+                laptops.getCategoryId(),
+                "color",
+                "black"
+        );
+        addCharacteristicForTest(color);
+
+        addProductCharacteristicForTest(laptopA, color.getCharacteristicId());
+
+        List<ProductInfo> products = List.of(
+                new ProductInfo(
+                        laptopA,
+                        "laptopA",
+                        "",
+                        10,
+                        12,
+                        24
+                )
+        );
+
+        //then
+        assertThat(categoryRepository.getProducts(new ProductQuery(
+                laptops.getCategoryId(),
+                new long[] {color.getCharacteristicId()},
+                SortingOption.PRICE,
+                0,
+                11,
+                true
+        ))).isEqualTo(products);
+    }
 }

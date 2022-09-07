@@ -10,9 +10,11 @@ import java.util.List;
 public class JdbcCategoryRepository implements  CategoryRepository{
 
     private final JdbcTemplate jdbcTemplate;
+    private final ColumnConverter columnConverter;
 
-    public JdbcCategoryRepository(JdbcTemplate jdbcTemplate) {
+    public JdbcCategoryRepository(JdbcTemplate jdbcTemplate, ColumnConverter columnConverter) {
         this.jdbcTemplate = jdbcTemplate;
+        this.columnConverter = columnConverter;
     }
 
     private String getParametersTemplate(int numberOfParameters) {
@@ -21,7 +23,7 @@ public class JdbcCategoryRepository implements  CategoryRepository{
 
     private String getOrderByStatement(ProductQuery productQuery) {
         return "ORDER BY " +
-                productQuery.getSortingOption().getColumnName() +
+                columnConverter.getColumnName(productQuery.getSortingOption()) +
                 (productQuery.isOrderDescending() ? " DESC " : " ASC ");
     }
 

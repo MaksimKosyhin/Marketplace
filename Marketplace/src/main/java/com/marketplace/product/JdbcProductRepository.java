@@ -5,6 +5,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 
 public class JdbcProductRepository implements  ProductRepository{
 
@@ -81,7 +82,7 @@ public class JdbcProductRepository implements  ProductRepository{
     }
 
     @Override
-    public long addShopProduct(ShopProduct shopProduct) {
+    public Map<String, Long> addShopProduct(ShopProduct shopProduct) {
         String sql = "INSERT INTO shop_products(shop_id, product_id, score, price, reviews) " +
                 "VALUES(?,?,?,?,?)";
 
@@ -94,7 +95,10 @@ public class JdbcProductRepository implements  ProductRepository{
                 shopProduct.getReviews()
         );
 
-        return  getLastShopId();
+        return  Map.of(
+                "productId", shopProduct.getProductId(),
+                "shopId", shopProduct.getShopId()
+        );
     }
 
     @Override

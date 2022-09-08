@@ -15,16 +15,6 @@ public class JdbcProductRepository implements  ProductRepository{
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    private long getLastProductId() {
-        return jdbcTemplate
-                .queryForObject("SELECT MAX(product_id) FROM products", Long.class);
-    }
-
-    private long getLastShopId() {
-        return jdbcTemplate
-                .queryForObject("SELECT MAX(shop_id) FROM shops", Long.class);
-    }
-
     @Override
     public Product getProduct(long productId) {
         String sql = "SELECT product_id, name, img_location " +
@@ -69,16 +59,16 @@ public class JdbcProductRepository implements  ProductRepository{
     @Override
     public long addProduct(Product product) {
         String sql = "INSERT INTO products(category_id, name, img_location) " +
-                "VALUES(?,?,?)";
+                "VALUES(?,?,?) " +
+                "RETURNING product_id";
 
-        jdbcTemplate.update(
+        return jdbcTemplate.queryForObject(
                 sql,
+                Long.class,
                 product.getCategory_id(),
                 product.getName(),
                 product.getImgLocation()
         );
-
-        return  getLastProductId();
     }
 
     @Override
@@ -101,16 +91,16 @@ public class JdbcProductRepository implements  ProductRepository{
     @Override
     public long addShop(Shop shop) {
         String sql = "INSERT INTO shops(name, link, img_location) " +
-                "VALUES(?,?,?)";
+                "VALUES(?,?,?) " +
+                "RETURNING shop_id";
 
-        jdbcTemplate.update(
+        return jdbcTemplate.queryForObject(
                 sql,
+                Long.class,
                 shop.getName(),
                 shop.getLink(),
                 shop.getImgLocation()
         );
-
-        return getLastShopId();
     }
 
     @Override

@@ -66,11 +66,14 @@ CREATE TABLE shop_products
      CONSTRAINT fk_product FOREIGN KEY(product_id) REFERENCES products(product_id) ON DELETE CASCADE
   );
 
+CREATE TYPE user_role AS ENUM('ADMIN', 'MODERATOR');
+
 CREATE TABLE users
   (
      user_id  INT GENERATED always AS IDENTITY,
-     username VARCHAR(90) NOT NULL,
+     username VARCHAR(90) UNIQUE NOT NULL,
      password TEXT NOT NULL,
+     role user_role,
      PRIMARY KEY(user_id)
   );
 

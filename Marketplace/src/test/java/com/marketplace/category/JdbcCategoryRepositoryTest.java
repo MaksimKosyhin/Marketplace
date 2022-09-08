@@ -2,6 +2,7 @@ package com.marketplace.category;
 
 import com.marketplace.product.ShopProduct;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -24,7 +25,7 @@ class JdbcCategoryRepositoryTest {
     private final CategoryRepository categoryRepository;
 
     private static PostgreSQLContainer container =
-            (PostgreSQLContainer) new PostgreSQLContainer("postgres")
+            (PostgreSQLContainer) new PostgreSQLContainer("postgres:latest")
                     .withReuse(true);
 
     @Autowired
@@ -44,6 +45,10 @@ class JdbcCategoryRepositoryTest {
     public static void setUp() {
         container.start();
     }
+
+    @AfterAll
+    public static  void closeContainer() {container.close();}
+
 
     @AfterEach
     void tearDown() {

@@ -13,9 +13,11 @@ public interface ProductRepository {
 
     public long addProduct(Product product);
 
-    public Map<String, Long> addShopProduct(ShopProduct shopProduct);
+    public boolean addShopProduct(ShopProduct shopProduct);
 
     public long addShop(Shop shop);
+
+    public boolean addCharacteristicToProduct(long productId, long characteristicId);
 
     public boolean removeProduct(long productId);
 

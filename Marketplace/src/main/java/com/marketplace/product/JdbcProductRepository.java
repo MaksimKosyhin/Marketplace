@@ -38,7 +38,7 @@ public class JdbcProductRepository implements  ProductRepository{
         String sql = "SELECT name, link, img_location, score, price, reviews " +
                 "FROM shops " +
                 "INNER JOIN shop_products " +
-                    "USING shop_id " +
+                    "USING(shop_id)" +
                 "WHERE " +
                     "product_id = ? AND " +
                     "shops.removed = FALSE AND " +
@@ -56,7 +56,7 @@ public class JdbcProductRepository implements  ProductRepository{
         String sql = "SELECT name, characteristic_value " +
                 "FROM characteristics " +
                 "INNER JOIN product_characteristics " +
-                    "ON characteristic_id " +
+                    "USING(characteristic_id)" +
                 "WHERE product_id = ?";
 
         return jdbcTemplate.query(
@@ -82,7 +82,7 @@ public class JdbcProductRepository implements  ProductRepository{
     }
 
     @Override
-    public Map<String, Long> addShopProduct(ShopProduct shopProduct) {
+    public boolean addShopProduct(ShopProduct shopProduct) {
         String sql = "INSERT INTO shop_products(shop_id, product_id, score, price, reviews) " +
                 "VALUES(?,?,?,?,?)";
 
@@ -95,10 +95,7 @@ public class JdbcProductRepository implements  ProductRepository{
                 shopProduct.getReviews()
         );
 
-        return  Map.of(
-                "productId", shopProduct.getProductId(),
-                "shopId", shopProduct.getShopId()
-        );
+        return true;
     }
 
     @Override
@@ -114,6 +111,15 @@ public class JdbcProductRepository implements  ProductRepository{
         );
 
         return getLastShopId();
+    }
+
+    @Override
+    public boolean addCharacteristicToProduct(long productId, long characteristicId) {
+        String sql = "INSERT INTO product_characteristics(product_id, characteristic_ic) " +
+                "VALUES(?,?)";
+        jdbcTemplate.update(sql, productId, characteristicId);
+
+        return true;
     }
 
     @Transactional
@@ -152,7 +158,7 @@ public class JdbcProductRepository implements  ProductRepository{
 
         String removeShopProducts = "UPDATE shop_products " +
                 "SET removed = TRUE " +
-                "WHERE product_id = ?";
+                "WHERE shop_id = ?";
         jdbcTemplate.update(removeShopProducts, shopId);
 
         return true;

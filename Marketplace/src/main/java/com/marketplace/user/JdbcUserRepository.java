@@ -15,8 +15,14 @@ public class JdbcUserRepository implements UserRepository{
 
     @Override
     public long addUser(User user) {
-        String sql = "INSERT INTO users(username, password, role) " +
-                "VALUES(?,?,CAST(? AS user_role)) " +
+        String sql = "INSERT INTO users(" +
+                    "username, " +
+                    "password, " +
+                    "role) " +
+                "VALUES(" +
+                    "?," +
+                    "?," +
+                    "CAST(? AS user_role)) " +
                 "RETURNING user_id";
 
         return  jdbcTemplate.queryForObject(

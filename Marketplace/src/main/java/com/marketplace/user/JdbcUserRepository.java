@@ -16,16 +16,16 @@ public class JdbcUserRepository implements UserRepository{
     @Override
     public long addUser(User user) {
         String sql = "INSERT INTO users(username, password, role) " +
-                "VALUES(?,?,CAST(? AS user_role))";
-        jdbcTemplate.update(
+                "VALUES(?,?,CAST(? AS user_role)) " +
+                "RETURNING user_id";
+
+        return  jdbcTemplate.queryForObject(
                 sql,
+                Long.class,
                 user.getUsername(),
                 user.getPassword(),
                 user.getRole().name()
         );
-
-        return jdbcTemplate.queryForObject(
-                "SELECT MAX(user_id) FROM users", Long.class);
     }
 
     @Override
@@ -37,7 +37,6 @@ public class JdbcUserRepository implements UserRepository{
     }
 
     private static class UserRowMapper implements RowMapper<User> {
-
         @Override
         public User mapRow(ResultSet rs, int rowNum) throws SQLException {
             User user = new User();

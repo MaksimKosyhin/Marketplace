@@ -27,95 +27,124 @@ public class JdbcCategoryRepository implements  CategoryRepository{
                 (productQuery.isOrderDescending() ? " DESC " : " ASC ");
     }
 
-    private long getLastCategoryId() {
-        return jdbcTemplate
-                .queryForObject("SELECT MAX(category_id) FROM categories", Long.class);
-    }
+    private long getCountOfCategoryUpdatedEntities(long categoryId) {
+        String template = "SELECT COUNT(*) " +
+                "FROM %s " +
+                "WHERE category_id = ?";
 
-    private long getLastCharacteristicId() {
-        return jdbcTemplate
-                .queryForObject("SELECT MAX(characteristic_id) FROM characteristics", Long.class);
+        int count = 0;
+
+        String countProducts = String.format(template, "products");
+        count += jdbcTemplate.queryForObject(countProducts, Integer.class, categoryId);
+
+        String countShopProducts = String.format(template, "shop_products");
+        count += jdbcTemplate.queryForObject(countShopProducts, Integer.class, categoryId);
+
+        return 1 + count;
     }
 
     @Override
     public boolean isParentCategory(long categoryId) {
-        String sql = "SELECT EXISTS(SELECT 1 FROM categories WHERE parent_id = ?)";
+        String sql = "SELECT EXISTS(" +
+                "SELECT 1 " +
+                "FROM categories " +
+                "WHERE parent_id = ? " +
+                "LIMIT 1)";
+
         return jdbcTemplate.queryForObject(sql, Boolean.class, categoryId);
     }
 
     @Override
     public List<Category> getCategories(long parentId) {
-        String sql = "SELECT parent_id, category_id, name, img_location " +
+        String sql = "SELECT " +
+                    "parent_id, " +
+                    "category_id, " +
+                    "name, " +
+                    "img_location " +
                 "FROM categories " +
-                "WHERE parent_id = ? AND removed = FALSE";
+                "WHERE " +
+                    "parent_id = ? AND " +
+                    "removed = FALSE";
 
-        return jdbcTemplate.query(sql,
+        return jdbcTemplate.query(
+                sql,
                 new BeanPropertyRowMapper<Category>(Category.class),
-                parentId);
+                parentId
+        );
     }
 
     @Override
     public List<ProductInfo> getProducts(ProductQuery productQuery) {
-        String queryProducts =
-                "SELECT " +
+        String sql = "SELECT " +
                     "product_id, " +
-                    "name, " +
-                    "img_location, " +
+                    "products.name AS name, " +
+                    "products.img_location AS img_location, " +
                     "MIN(price) AS min_price, " +
                     "MAX(price) AS max_price, " +
                     "SUM(reviews) AS total_reviews " +
                 "FROM products " +
-                "INNER JOIN (" +
-                        "SELECT product_id, score, price, reviews " +
-                        "FROM shop_products " +
-                        "INNER JOIN (" +
-                                "SELECT shop_id " +
-                                "FROM shops " +
-                                "WHERE removed = FALSE) shops " +
-                            "USING(shop_id) " +
-                        "WHERE removed = FALSE) shop_values " +
+                "INNER JOIN shop_products " +
                     "USING(product_id) " +
+                "INNER JOIN shops " +
+                    "USING(shop_id) " +
                 "INNER JOIN (" +
-                        "SELECT product_id " +
-                        "FROM product_characteristics " +
-                        "WHERE characteristic_id " +
-                            "IN(" + getParametersTemplate
-                                (productQuery.getNumberOfCharacteristics()) + ")) characteristics " +
+                    "SELECT product_id " +
+                    "FROM product_characteristics " +
+                    "WHERE characteristic_id " +
+                        "IN(" + getParametersTemplate
+                        (productQuery.getNumberOfCharacteristics()) + ")) characteristics " +
                     "USING(product_id) " +
                 "WHERE " +
-                    "removed = FALSE " +
-                    "AND category_id = ? " +
-                    "AND product_id > ? " +
+                    "products.removed = FALSE AND " +
+                    "shop_products.removed = FALSE AND " +
+                    "shops.removed = FALSE AND " +
+                    "category_id = ? AND " +
+                    "product_id > ?" +
                 "GROUP BY product_id " +
                 getOrderByStatement(productQuery) +
                 "LIMIT ?";
 
-        return jdbcTemplate.query(queryProducts,
+        return jdbcTemplate.query(
+                sql,
                 new BeanPropertyRowMapper<ProductInfo>(ProductInfo.class),
-                productQuery.getQueryParameters());
+                productQuery.getQueryParameters()
+        );
     }
 
     @Override
     public long addCategory(Category category) {
-        String sql = "INSERT INTO categories (name, parent_id, img_location) " +
-                "VALUES (?, ?, ?)";
-        jdbcTemplate.update(sql,
-                category.getName(), category.getParentId(), category.getImgLocation());
+        String sql = "INSERT INTO categories(" +
+                    "name, " +
+                    "parent_id, " +
+                    "img_location) " +
+                "VALUES (?, ?, ?) " +
+                "RETURNING category_id";
 
-        return  getLastCategoryId();
+        return jdbcTemplate.queryForObject(
+                sql,
+                Long.class,
+                category.getName(),
+                category.getParentId(),
+                category.getImgLocation()
+        );
     }
 
     @Override
     public long addCharacteristic(Characteristic characteristic) {
-        String sql = "INSERT INTO characteristics (category_id, name, characteristic_value) " +
-                "VALUES (?, ?, ?)";
+        String sql = "INSERT INTO characteristics(" +
+                    "category_id, " +
+                    "name, " +
+                    "characteristic_value) " +
+                "VALUES (?, ?, ?) " +
+                "RETURNING characteristic_id";
 
-        jdbcTemplate.update(sql,
+        return jdbcTemplate.queryForObject(
+                sql,
+                Long.class,
                 characteristic.getCategoryId(),
                 characteristic.getName(),
-                characteristic.getCharacteristicValue());
-
-        return  getLastCharacteristicId();
+                characteristic.getCharacteristicValue()
+        );
     }
 
     @Override
@@ -132,16 +161,26 @@ public class JdbcCategoryRepository implements  CategoryRepository{
     @Override
     @Transactional
     public boolean removeCategory(long categoryId) {
-        String removeCategory = "UPDATE categories SET removed = TRUE WHERE category_id = ?";
-        jdbcTemplate.update(removeCategory, categoryId);
+        int updated = 0;
 
-        String removeProducts = "UPDATE products SET removed = TRUE WHERE category_id = ?";
-        jdbcTemplate.update(removeProducts, categoryId);
+        String removeCategory = "UPDATE categories " +
+                "SET removed = TRUE " +
+                "WHERE category_id = ?";
+        updated += jdbcTemplate.update(removeCategory, categoryId);
 
-        String removeShopProducts = "UPDATE shop_products SET removed = TRUE WHERE product_id IN " +
-                "(SELECT product_id FROM products WHERE removed = TRUE)";
-        jdbcTemplate.update(removeShopProducts);
+        String removeProducts = "UPDATE products " +
+                "SET removed = TRUE " +
+                "WHERE category_id = ?";
+        updated += jdbcTemplate.update(removeProducts, categoryId);
 
-        return true;
+        String removeShopProducts = "UPDATE shop_products " +
+                "SET removed = TRUE " +
+                "WHERE product_id IN(" +
+                    "SELECT product_id " +
+                    "FROM products " +
+                    "WHERE removed = TRUE)";
+        updated += jdbcTemplate.update(removeShopProducts);
+
+        return updated == getCountOfCategoryUpdatedEntities(categoryId);
     }
 }

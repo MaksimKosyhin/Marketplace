@@ -28,16 +28,21 @@ public class JdbcCategoryRepository implements  CategoryRepository{
     }
 
     private long getCountOfCategoryUpdatedEntities(long categoryId) {
-        String template = "SELECT COUNT(*) " +
-                "FROM %s " +
-                "WHERE category_id = ?";
-
         int count = 0;
 
-        String countProducts = String.format(template, "products");
+        String  countProducts = "SELECT COUNT(*) " +
+                "FROM products " +
+                "WHERE category_id = ? ";
         count += jdbcTemplate.queryForObject(countProducts, Integer.class, categoryId);
 
-        String countShopProducts = String.format(template, "shop_products");
+        String countShopProducts = "WITH updated_products AS (" +
+                    "SELECT product_id " +
+                    "FROM products " +
+                    "WHERE category_id = ?) " +
+                "SELECT COUNT(*) " +
+                "FROM shop_products " +
+                "INNER JOIN updated_products " +
+                    "USING(product_id)";
         count += jdbcTemplate.queryForObject(countShopProducts, Integer.class, categoryId);
 
         return 1 + count;

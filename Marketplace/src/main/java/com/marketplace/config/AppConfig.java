@@ -3,12 +3,19 @@ package com.marketplace.config;
 import com.marketplace.category.CategoryRepository;
 import com.marketplace.category.ColumnConverter;
 import com.marketplace.category.JdbcCategoryRepository;
+import com.marketplace.order.JdbcOrderRepository;
+import com.marketplace.order.OrderRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 @Configuration
-public class CategoryConfig {
+public class AppConfig {
+
+    @Bean
+    public OrderRepository orderRepository(JdbcTemplate jdbcTemplate) {
+        return new JdbcOrderRepository(jdbcTemplate);
+    }
 
     @Bean
     public CategoryRepository categoryRepository(JdbcTemplate jdbcTemplate, ColumnConverter columnConverter) {

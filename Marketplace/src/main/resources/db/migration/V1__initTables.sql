@@ -98,7 +98,7 @@ CREATE TABLE order_shop_products
      order_id   INT,
      product_id INT,
      shop_id    INT,
-     amount     INT CHECK (amount > 0),
+     amount     INT NOT NULL CHECK (amount > 0),
      PRIMARY KEY(order_id, product_id, shop_id),
      CONSTRAINT fk_order FOREIGN KEY(order_id) REFERENCES orders(order_id) ON DELETE CASCADE,
      CONSTRAINT fk_product FOREIGN KEY(product_id) REFERENCES products(product_id) ON DELETE CASCADE,

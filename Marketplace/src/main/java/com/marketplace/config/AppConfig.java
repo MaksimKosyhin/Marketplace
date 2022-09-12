@@ -1,10 +1,14 @@
 package com.marketplace.config;
 
+
 import com.marketplace.app_analytics.AppAnalyticsRepository;
 import com.marketplace.app_analytics.JdbcAppAnalyticsRepository;
 import com.marketplace.category.CategoryRepository;
 import com.marketplace.category.ColumnConverter;
 import com.marketplace.category.JdbcCategoryRepository;
+import com.marketplace.order.JdbcOrderRepository;
+import com.marketplace.order.OrderRepository;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -16,6 +20,12 @@ public class AppConfig {
     public AppAnalyticsRepository appAnalyticsRepository(JdbcTemplate jdbcTemplate) {
         return new JdbcAppAnalyticsRepository(jdbcTemplate);
     }
+    
+    @Bean
+    public OrderRepository orderRepository(JdbcTemplate jdbcTemplate) {
+        return new JdbcOrderRepository(jdbcTemplate);
+    }
+
     @Bean
     public CategoryRepository categoryRepository(JdbcTemplate jdbcTemplate, ColumnConverter columnConverter) {
         return new JdbcCategoryRepository(jdbcTemplate, columnConverter);

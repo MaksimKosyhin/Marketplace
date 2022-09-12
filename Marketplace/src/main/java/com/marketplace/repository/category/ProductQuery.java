@@ -1,5 +1,14 @@
 package com.marketplace.repository.category;
 
+import com.marketplace.service.category.SortingOption;
+import lombok.*;
+
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
+@EqualsAndHashCode
+@ToString
 public class ProductQuery {
     private long categoryId;
     private long[] characteristics;
@@ -7,15 +16,6 @@ public class ProductQuery {
     private long startId;
     private long size;
     private boolean orderDescending;
-
-    public ProductQuery(long categoryId, long[] characteristics, SortingOption sortingOption, long startId, long size, boolean orderDescending) {
-        this.categoryId = categoryId;
-        this.characteristics = characteristics;
-        this.sortingOption = sortingOption;
-        this.startId = startId;
-        this.size = size;
-        this.orderDescending = orderDescending;
-    }
 
     public boolean isOrderDescending() {
         return orderDescending;

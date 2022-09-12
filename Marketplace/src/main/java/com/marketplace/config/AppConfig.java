@@ -13,6 +13,8 @@ import com.marketplace.repository.app_analytics.JdbcAppAnalyticsRepository;
 import com.marketplace.repository.order.JdbcOrderRepository;
 import com.marketplace.repository.order.OrderRepository;
 
+import com.marketplace.service.category.CategoryService;
+import com.marketplace.service.category.JdbcCategoryService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -21,12 +23,19 @@ import org.springframework.jdbc.core.JdbcTemplate;
 public class AppConfig {
 
     @Bean
+    public CategoryService categoryService(
+            CategoryRepository categoryRepository, ImageLoader imageLoader) {
+
+        return new JdbcCategoryService(categoryRepository, imageLoader);
+    }
+
+    @Bean
     public ProductRepository productRepository(JdbcTemplate jdbcTemplate) {
         return new JdbcProductRepository(jdbcTemplate);
     }
 
     @Bean
-    public UserRepository userRepository(JdbcTemplate jdbcTemplate){
+    public UserRepository userRepository(JdbcTemplate jdbcTemplate) {
         return new JdbcUserRepository(jdbcTemplate);
     }
 

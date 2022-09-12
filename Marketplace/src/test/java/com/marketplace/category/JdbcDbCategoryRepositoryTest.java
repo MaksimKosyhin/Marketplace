@@ -2,6 +2,7 @@ package com.marketplace.category;
 
 import com.marketplace.repository.product.ShopProduct;
 import com.marketplace.repository.category.*;
+import com.marketplace.service.category.SortingOption;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -20,7 +21,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-class JdbcCategoryRepositoryTest {
+class JdbcDbCategoryRepositoryTest {
 
     private final JdbcTemplate jdbcTemplate;
     private final CategoryRepository categoryRepository;
@@ -30,7 +31,7 @@ class JdbcCategoryRepositoryTest {
                     .withReuse(true);
 
     @Autowired
-    JdbcCategoryRepositoryTest(JdbcTemplate jdbcTemplate, CategoryRepository categoryRepository) {
+    JdbcDbCategoryRepositoryTest(JdbcTemplate jdbcTemplate, CategoryRepository categoryRepository) {
         this.jdbcTemplate = jdbcTemplate;
         this.categoryRepository = categoryRepository;
     }
@@ -71,12 +72,12 @@ class JdbcCategoryRepositoryTest {
                 .queryForObject("SELECT MAX(shop_id) FROM shops", Long.class);
     }
 
-    private void addCategoryForTest(Category category) {
+    private void addCategoryForTest(DbCategory dbCategory) {
         String sql = "INSERT INTO categories(name, parent_id, img_location) " +
                 "VALUES(?, ?, ?)";
         jdbcTemplate.update(sql,
-                category.getName(), category.getParentId(), category.getImgLocation());
-        category.setCategoryId(this.queryLastCategoryId());
+                dbCategory.getName(), dbCategory.getParentId(), dbCategory.getImgLocation());
+        dbCategory.setCategoryId(this.queryLastCategoryId());
     }
 
     private void addProductForTest(String name, long categoryId) {
@@ -85,16 +86,16 @@ class JdbcCategoryRepositoryTest {
         jdbcTemplate.update(sql, name, categoryId);
     }
 
-    private void addCharacteristicForTest(Characteristic characteristic) {
+    private void addCharacteristicForTest(DbCharacteristic dbCharacteristic) {
         String sql = "INSERT INTO characteristics (category_id, name, characteristic_value) " +
                 "VALUES (?, ?, ?)";
 
         jdbcTemplate.update(sql,
-                characteristic.getCategoryId(),
-                characteristic.getName(),
-                characteristic.getCharacteristicValue());
+                dbCharacteristic.getCategoryId(),
+                dbCharacteristic.getName(),
+                dbCharacteristic.getCharacteristicValue());
 
-        characteristic.setCharacteristicId(jdbcTemplate.queryForObject(
+        dbCharacteristic.setCharacteristicId(jdbcTemplate.queryForObject(
                 "SELECT MAX(characteristic_id) FROM characteristics",
                 Long.class));
     }
@@ -147,26 +148,26 @@ class JdbcCategoryRepositoryTest {
     @Test
     void isNotParentCategoryWithoutSubcategories() {
         //given
-        Category category = new Category(
+        DbCategory dbCategory = new DbCategory(
                 "electronics",
                 null,
                 "dir1");
-        addCategoryForTest(category);
+        addCategoryForTest(dbCategory);
 
         //then
-        assertThat(categoryRepository.isParentCategory(category.getCategoryId())).isFalse();
+        assertThat(categoryRepository.isParentCategory(dbCategory.getCategoryId())).isFalse();
     }
 
     @Test
     void isParentCategoryIfHasSubcategories() {
         //given
-        Category parent = new Category(
+        DbCategory parent = new DbCategory(
                 "electronics",
                 null,
                 "dir1");
         addCategoryForTest(parent);
 
-        Category child = new Category(
+        DbCategory child = new DbCategory(
                 "laptops",
                 parent.getCategoryId(),
                 "dir2");
@@ -179,25 +180,25 @@ class JdbcCategoryRepositoryTest {
     @Test
     void returnsSubcategoriesOfParentCategory() {
         //given
-        Category electronics = new Category(
+        DbCategory electronics = new DbCategory(
                 "electronics",
                 null,
                 "dir1");
         addCategoryForTest(electronics);
 
-        Category laptops = new Category(
+        DbCategory laptops = new DbCategory(
                 "laptops",
                 electronics.getCategoryId(),
                 "dir2");
         addCategoryForTest(laptops);
 
-        Category tablets = new Category(
+        DbCategory tablets = new DbCategory(
                 "tablets",
                 electronics.getCategoryId(),
                 "dir3");
         addCategoryForTest(tablets);
 
-        Category smartphones = new Category(
+        DbCategory smartphones = new DbCategory(
                 "smartphones",
                 electronics.getCategoryId(),
                 "dir4");
@@ -216,84 +217,84 @@ class JdbcCategoryRepositoryTest {
     @Test
     void addsCategory() {
         //given
-        Category category = new Category(
+        DbCategory dbCategory = new DbCategory(
                 "electronics",
                 null,
                 "dir");
 
         //when
-        categoryRepository.addCategory(category);
-        category.setCategoryId(queryLastCategoryId());
+        categoryRepository.addCategory(dbCategory);
+        dbCategory.setCategoryId(queryLastCategoryId());
 
         //then
         assertThat(
                 jdbcTemplate.queryForObject(
                         "SELECT category_id, name, parent_id, img_location FROM categories",
-                        new BeanPropertyRowMapper<Category>(Category.class)))
-                .isEqualTo(category);
+                        new BeanPropertyRowMapper<DbCategory>(DbCategory.class)))
+                .isEqualTo(dbCategory);
     }
 
     @Test
     void addsCharacteristic() {
         //given
-        Category laptops = new Category(
+        DbCategory laptops = new DbCategory(
                 "laptops",
                 null,
                 "dir2");
         addCategoryForTest(laptops);
 
-        List<Characteristic> characteristic = List.of(
-                new Characteristic(
+        List<DbCharacteristic> dbCharacteristic = List.of(
+                new DbCharacteristic(
                         laptops.getCategoryId(),
                         "color",
                         "grey"));
 
-        characteristic.get(0).setCharacteristicId(jdbcTemplate.queryForObject(
+        dbCharacteristic.get(0).setCharacteristicId(jdbcTemplate.queryForObject(
                 "SELECT MAX(characteristic_id) FROM characteristics",
                 Long.class));
 
         //when
-        categoryRepository.addCharacteristic(characteristic.get(0));
+        categoryRepository.addCharacteristic(dbCharacteristic.get(0));
 
         //then
         assertThat(jdbcTemplate.query(
                 "SELECT category_id, name, characteristic_value FROM characteristics",
-                new BeanPropertyRowMapper<Characteristic>(Characteristic.class)))
-                .isEqualTo(characteristic);
+                new BeanPropertyRowMapper<DbCharacteristic>(DbCharacteristic.class)))
+                .isEqualTo(dbCharacteristic);
     }
 
     @Test
     void returnsCharacteristicsOfAllProductsInCategory() {
         //given
-        Category laptops = new Category(
+        DbCategory laptops = new DbCategory(
                 "laptops",
                 null,
                 "dir1"
         );
         addCategoryForTest(laptops);
 
-        Category pants = new Category(
+        DbCategory pants = new DbCategory(
                 "pants",
                 null,
                 "dir2"
         );
         addCategoryForTest(pants);
 
-        Characteristic diagonal = new Characteristic(
+        DbCharacteristic diagonal = new DbCharacteristic(
                 laptops.getCategoryId(),
                 "diagonal",
                 "15.6"
         );
         addCharacteristicForTest(diagonal);
 
-        Characteristic operativeMemory = new Characteristic(
+        DbCharacteristic operativeMemory = new DbCharacteristic(
                 laptops.getCategoryId(),
                 "operative memory",
                 "32"
         );
         addCharacteristicForTest(operativeMemory);
 
-        Characteristic size = new Characteristic(
+        DbCharacteristic size = new DbCharacteristic(
                 pants.getCategoryId(),
                 "size",
                 "XL"
@@ -308,7 +309,7 @@ class JdbcCategoryRepositoryTest {
     @Test
     void removesCategory() {
         //given
-        Category laptops = new Category(
+        DbCategory laptops = new DbCategory(
                 "laptops",
                 null,
                 "dir1"
@@ -325,14 +326,14 @@ class JdbcCategoryRepositoryTest {
     @Test
     void removesOnlyChosenCategory() {
         //given
-        Category laptops = new Category(
+        DbCategory laptops = new DbCategory(
                 "laptops",
                 null,
                 "dir1"
         );
         addCategoryForTest(laptops);
 
-        Category tablets = new Category(
+        DbCategory tablets = new DbCategory(
                 "tablets",
                 null,
                 "dir2"
@@ -350,7 +351,7 @@ class JdbcCategoryRepositoryTest {
     @Test
     void removesProductsOfRemovedCategory() {
         //given
-        Category laptops = new Category(
+        DbCategory laptops = new DbCategory(
                 "laptops",
                 null,
                 "dir1"
@@ -373,14 +374,14 @@ class JdbcCategoryRepositoryTest {
     @Test
     void removesOnlyShopProductsOfRemovedCategory() {
         //given
-        Category laptops = new Category(
+        DbCategory laptops = new DbCategory(
                 "laptops",
                 null,
                 "dir1"
         );
         addCategoryForTest(laptops);
 
-        Category tablets = new Category(
+        DbCategory tablets = new DbCategory(
                 "tablets",
                 null,
                 "dir2"
@@ -430,7 +431,7 @@ class JdbcCategoryRepositoryTest {
     @Test
     void removesShopProductsOfRemovedCategory() {
         //given
-        Category laptops = new Category(
+        DbCategory laptops = new DbCategory(
                 "laptops",
                 null,
                 "dir1"
@@ -470,7 +471,7 @@ class JdbcCategoryRepositoryTest {
     @Test
     void removesOnlyProductsOfRemovedCategory() {
         //given
-        Category laptops = new Category(
+        DbCategory laptops = new DbCategory(
                 -1L,
                 "laptops",
                 null,
@@ -478,7 +479,7 @@ class JdbcCategoryRepositoryTest {
         );
         addCategoryForTest(laptops);
 
-        Category tablets = new Category(
+        DbCategory tablets = new DbCategory(
                 -1L,
                 "tablets",
                 null,
@@ -515,7 +516,7 @@ class JdbcCategoryRepositoryTest {
 
     @Test
     void returnsProductsOfCategory() {
-        Category laptops = new Category(
+        DbCategory laptops = new DbCategory(
                 -1L,
                 "laptops",
                 null,
@@ -545,7 +546,7 @@ class JdbcCategoryRepositoryTest {
         );
         addShopProductForTest(secondShopForLaptopA);
 
-        Characteristic color = new Characteristic(
+        DbCharacteristic color = new DbCharacteristic(
                 -1L,
                 laptops.getCategoryId(),
                 "color",
@@ -555,8 +556,8 @@ class JdbcCategoryRepositoryTest {
 
         addProductCharacteristicForTest(laptopA, color.getCharacteristicId());
 
-        List<ProductInfo> products = List.of(
-                new ProductInfo(
+        List<DbProductInfo> products = List.of(
+                new DbProductInfo(
                         laptopA,
                         "laptopA",
                         "",

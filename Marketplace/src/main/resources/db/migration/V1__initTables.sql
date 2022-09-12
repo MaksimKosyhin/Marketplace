@@ -60,7 +60,7 @@ CREATE TABLE category_shops
      PRIMARY KEY(category_id, shop_id),
      CONSTRAINT fk_category FOREIGN KEY(category_id) REFERENCES categories(category_id) ON DELETE CASCADE,
      CONSTRAINT fk_shop FOREIGN KEY(shop_id) REFERENCES shops(shop_id) ON DELETE CASCADE
-  )
+  );
 
 CREATE TABLE shop_products
   (

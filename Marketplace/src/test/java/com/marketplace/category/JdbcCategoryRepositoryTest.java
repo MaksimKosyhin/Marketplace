@@ -1,6 +1,8 @@
 package com.marketplace.category;
 
-import com.marketplace.product.ShopProduct;
+import com.marketplace.repository.product.ShopProduct;
+import com.marketplace.repository.app_analytics.category.*;
+import com.marketplace.repository.category.*;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;

@@ -1,13 +1,14 @@
 package com.marketplace.product;
 
-import com.marketplace.category.Category;
-import com.marketplace.category.Characteristic;
+import com.marketplace.repository.category.Characteristic;
+import com.marketplace.repository.product.ProductCharacteristic;
+import com.marketplace.repository.product.ProductRepository;
+import com.marketplace.repository.product.ShopProduct;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;

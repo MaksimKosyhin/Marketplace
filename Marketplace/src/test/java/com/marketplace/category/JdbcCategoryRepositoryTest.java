@@ -1,6 +1,8 @@
 package com.marketplace.category;
 
+import com.marketplace.product.ShopProduct;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -23,7 +25,7 @@ class JdbcCategoryRepositoryTest {
     private final CategoryRepository categoryRepository;
 
     private static PostgreSQLContainer container =
-            (PostgreSQLContainer) new PostgreSQLContainer("postgres")
+            (PostgreSQLContainer) new PostgreSQLContainer("postgres:latest")
                     .withReuse(true);
 
     @Autowired
@@ -43,6 +45,10 @@ class JdbcCategoryRepositoryTest {
     public static void setUp() {
         container.start();
     }
+
+    @AfterAll
+    public static  void closeContainer() {container.close();}
+
 
     @AfterEach
     void tearDown() {
@@ -141,7 +147,6 @@ class JdbcCategoryRepositoryTest {
     void isNotParentCategoryWithoutSubcategories() {
         //given
         Category category = new Category(
-                -1L,
                 "electronics",
                 null,
                 "dir1");
@@ -155,14 +160,12 @@ class JdbcCategoryRepositoryTest {
     void isParentCategoryIfHasSubcategories() {
         //given
         Category parent = new Category(
-                -1L,
                 "electronics",
                 null,
                 "dir1");
         addCategoryForTest(parent);
 
         Category child = new Category(
-                -1L,
                 "laptops",
                 parent.getCategoryId(),
                 "dir2");
@@ -176,28 +179,24 @@ class JdbcCategoryRepositoryTest {
     void returnsSubcategoriesOfParentCategory() {
         //given
         Category electronics = new Category(
-                -1L,
                 "electronics",
                 null,
                 "dir1");
         addCategoryForTest(electronics);
 
         Category laptops = new Category(
-                -1L,
                 "laptops",
                 electronics.getCategoryId(),
                 "dir2");
         addCategoryForTest(laptops);
 
         Category tablets = new Category(
-                -1L,
                 "tablets",
                 electronics.getCategoryId(),
                 "dir3");
         addCategoryForTest(tablets);
 
         Category smartphones = new Category(
-                -1L,
                 "smartphones",
                 electronics.getCategoryId(),
                 "dir4");
@@ -217,7 +216,6 @@ class JdbcCategoryRepositoryTest {
     void addsCategory() {
         //given
         Category category = new Category(
-                -1L,
                 "electronics",
                 null,
                 "dir");
@@ -238,7 +236,6 @@ class JdbcCategoryRepositoryTest {
     void addsCharacteristic() {
         //given
         Category laptops = new Category(
-                -1L,
                 "laptops",
                 null,
                 "dir2");
@@ -246,7 +243,6 @@ class JdbcCategoryRepositoryTest {
 
         List<Characteristic> characteristic = List.of(
                 new Characteristic(
-                        -1L,
                         laptops.getCategoryId(),
                         "color",
                         "grey"));
@@ -269,7 +265,6 @@ class JdbcCategoryRepositoryTest {
     void returnsCharacteristicsOfAllProductsInCategory() {
         //given
         Category laptops = new Category(
-                -1L,
                 "laptops",
                 null,
                 "dir1"
@@ -277,7 +272,6 @@ class JdbcCategoryRepositoryTest {
         addCategoryForTest(laptops);
 
         Category pants = new Category(
-                -1L,
                 "pants",
                 null,
                 "dir2"
@@ -285,7 +279,6 @@ class JdbcCategoryRepositoryTest {
         addCategoryForTest(pants);
 
         Characteristic diagonal = new Characteristic(
-                -1L,
                 laptops.getCategoryId(),
                 "diagonal",
                 "15.6"
@@ -293,7 +286,6 @@ class JdbcCategoryRepositoryTest {
         addCharacteristicForTest(diagonal);
 
         Characteristic operativeMemory = new Characteristic(
-                -1L,
                 laptops.getCategoryId(),
                 "operative memory",
                 "32"
@@ -301,7 +293,6 @@ class JdbcCategoryRepositoryTest {
         addCharacteristicForTest(operativeMemory);
 
         Characteristic size = new Characteristic(
-                -1L,
                 pants.getCategoryId(),
                 "size",
                 "XL"
@@ -317,7 +308,6 @@ class JdbcCategoryRepositoryTest {
     void removesCategory() {
         //given
         Category laptops = new Category(
-                -1L,
                 "laptops",
                 null,
                 "dir1"
@@ -335,7 +325,6 @@ class JdbcCategoryRepositoryTest {
     void removesOnlyChosenCategory() {
         //given
         Category laptops = new Category(
-                -1L,
                 "laptops",
                 null,
                 "dir1"
@@ -343,7 +332,6 @@ class JdbcCategoryRepositoryTest {
         addCategoryForTest(laptops);
 
         Category tablets = new Category(
-                -1L,
                 "tablets",
                 null,
                 "dir2"
@@ -362,7 +350,6 @@ class JdbcCategoryRepositoryTest {
     void removesProductsOfRemovedCategory() {
         //given
         Category laptops = new Category(
-                -1L,
                 "laptops",
                 null,
                 "dir1"
@@ -386,7 +373,6 @@ class JdbcCategoryRepositoryTest {
     void removesOnlyShopProductsOfRemovedCategory() {
         //given
         Category laptops = new Category(
-                -1L,
                 "laptops",
                 null,
                 "dir1"
@@ -394,7 +380,6 @@ class JdbcCategoryRepositoryTest {
         addCategoryForTest(laptops);
 
         Category tablets = new Category(
-                -1L,
                 "tablets",
                 null,
                 "dir2"
@@ -416,27 +401,21 @@ class JdbcCategoryRepositoryTest {
         ShopProduct shopForLaptopA = new ShopProduct(
                 shopForLaptops,
                 laptopA,
-                -1,
-                -1,
-                -1
+                "", "", "",-1, -1, -1
         );
         addShopProductForTest(shopForLaptopA);
 
         ShopProduct shopForLaptopB = new ShopProduct(
                 shopForLaptops,
                 laptopB,
-                -1,
-                -1,
-                -1
+                "", "", "",-1, -1, -1
         );
         addShopProductForTest(shopForLaptopB);
 
         ShopProduct shopForTabletC = new ShopProduct(
                 shopForTablets,
                 tabletC,
-                -1,
-                -1,
-                -1
+                "", "", "",-1, -1, -1
         );
         addShopProductForTest(shopForTabletC);
 
@@ -451,7 +430,6 @@ class JdbcCategoryRepositoryTest {
     void removesShopProductsOfRemovedCategory() {
         //given
         Category laptops = new Category(
-                -1L,
                 "laptops",
                 null,
                 "dir1"
@@ -469,18 +447,14 @@ class JdbcCategoryRepositoryTest {
         ShopProduct shopForLaptopA = new ShopProduct(
                 shopForLaptops,
                 laptopA,
-                -1,
-                -1,
-                -1
+                "", "", "",-1, -1, -1
         );
         addShopProductForTest(shopForLaptopA);
 
         ShopProduct shopForLaptopB = new ShopProduct(
                 shopForLaptops,
                 laptopB,
-                -1,
-                -1,
-                -1
+                "", "", "",-1, -1, -1
         );
         addShopProductForTest(shopForLaptopB);
 
@@ -559,18 +533,14 @@ class JdbcCategoryRepositoryTest {
         ShopProduct firstShopForLaptopA = new ShopProduct(
                 firstShopForLaptops,
                 laptopA,
-                5,
-                10,
-                15
+                "", "", "",-1, 10, 16
         );
         addShopProductForTest(firstShopForLaptopA);
 
         ShopProduct secondShopForLaptopA = new ShopProduct(
                 secondShopForLaptops,
                 laptopA,
-                4,
-                12,
-                9
+                "", "", "",-1, 12, 8
         );
         addShopProductForTest(secondShopForLaptopA);
 

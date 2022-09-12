@@ -1,17 +1,17 @@
 package com.marketplace.config;
 
 
-import com.marketplace.category.CategoryRepository;
-import com.marketplace.category.ColumnConverter;
-import com.marketplace.category.JdbcCategoryRepository;
-import com.marketplace.product.JdbcProductRepository;
-import com.marketplace.product.ProductRepository;
-import com.marketplace.user.JdbcUserRepository;
-import com.marketplace.user.UserRepository;
-import com.marketplace.app_analytics.AppAnalyticsRepository;
-import com.marketplace.app_analytics.JdbcAppAnalyticsRepository;
-import com.marketplace.order.JdbcOrderRepository;
-import com.marketplace.order.OrderRepository;
+import com.marketplace.repository.category.CategoryRepository;
+import com.marketplace.repository.category.ColumnConverter;
+import com.marketplace.repository.category.JdbcCategoryRepository;
+import com.marketplace.repository.product.JdbcProductRepository;
+import com.marketplace.repository.product.ProductRepository;
+import com.marketplace.repository.user.JdbcUserRepository;
+import com.marketplace.repository.user.UserRepository;
+import com.marketplace.repository.app_analytics.AppAnalyticsRepository;
+import com.marketplace.repository.app_analytics.JdbcAppAnalyticsRepository;
+import com.marketplace.repository.order.JdbcOrderRepository;
+import com.marketplace.repository.order.OrderRepository;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,10 +23,12 @@ public class AppConfig {
     @Bean
     public ProductRepository productRepository(JdbcTemplate jdbcTemplate) {
         return new JdbcProductRepository(jdbcTemplate);
+    }
 
     @Bean
-    public UserRepository userRepository(JdbcTemplate jdbcTemplate) {
+    public UserRepository userRepository(JdbcTemplate jdbcTemplate){
         return new JdbcUserRepository(jdbcTemplate);
+    }
 
     @Bean
     public AppAnalyticsRepository appAnalyticsRepository(JdbcTemplate jdbcTemplate) {

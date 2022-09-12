@@ -1,5 +1,8 @@
 package com.marketplace.user;
 
+import com.marketplace.repository.user.User;
+import com.marketplace.repository.user.UserRepository;
+import com.marketplace.repository.user.UserRole;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;

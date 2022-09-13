@@ -1,6 +1,6 @@
 package com.marketplace.product;
 
-import com.marketplace.repository.category.Characteristic;
+import com.marketplace.repository.category.DbCharacteristic;
 import com.marketplace.repository.product.ProductCharacteristic;
 import com.marketplace.repository.product.ProductRepository;
 import com.marketplace.repository.product.ShopProduct;
@@ -95,14 +95,14 @@ class JdbcProductRepositoryTest {
         shopProduct.setShopId(0);
     }
 
-    private long addCharacteristicForTest(Characteristic characteristic) {
+    private long addCharacteristicForTest(DbCharacteristic dbCharacteristic) {
         String sql = "INSERT INTO characteristics(category_id, name, characteristic_value) " +
                 "VALUES(?,?,?)";
         jdbcTemplate.update(
                 sql,
-                characteristic.getCategoryId(),
-                characteristic.getName(),
-                characteristic.getCharacteristicValue());
+                dbCharacteristic.getCategoryId(),
+                dbCharacteristic.getName(),
+                dbCharacteristic.getCharacteristicValue());
 
         return jdbcTemplate.queryForObject(
                 "SELECT MAX(characteristic_id) FROM characteristics",
@@ -147,9 +147,9 @@ class JdbcProductRepositoryTest {
         long fruits = addCategoryForTest("fruits");
         long apple = addProductForTest(fruits, "apple");
         long colorId = addCharacteristicForTest(
-                new Characteristic(fruits, "color", "green"));
+                new DbCharacteristic(fruits, "color", "green"));
         long weightId = addCharacteristicForTest(
-                new Characteristic(fruits, "weight", "50g"));
+                new DbCharacteristic(fruits, "weight", "50g"));
 
         addProductCharacteristicForTest(apple, colorId);
         addProductCharacteristicForTest(apple, weightId);

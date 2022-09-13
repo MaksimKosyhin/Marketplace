@@ -3,17 +3,19 @@ package com.marketplace.repository.category;
 import java.util.List;
 
 public interface CategoryRepository {
+    public boolean categoryExists(long categoryId);
+
     public boolean isParentCategory(long categoryId);
 
-    public List<Category> getCategories(long parentId);
+    public List<DbCategory> getCategories(long parentId);
 
-    public List<ProductInfo> getProducts(ProductQuery productQuery);
+    public List<DbProductInfo> getProducts(ProductQuery productQuery);
 
     public boolean removeCategory(long categoryId);
 
-    public long addCategory(Category category);
+    public long addCategory(DbCategory dbCategory);
 
-    public long addCharacteristic(Characteristic characteristic);
+    public long addCharacteristic(DbCharacteristic dbCharacteristic);
 
-    public List<Characteristic> getCharacteristics(long categoryId);
+    public List<DbCharacteristic> getCharacteristics(long categoryId);
 }

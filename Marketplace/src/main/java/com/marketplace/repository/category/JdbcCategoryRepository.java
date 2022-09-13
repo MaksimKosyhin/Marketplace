@@ -38,14 +38,25 @@ public class JdbcCategoryRepository implements  CategoryRepository{
         String countShopProducts = "WITH updated_products AS (" +
                     "SELECT product_id " +
                     "FROM products " +
-                    "WHERE category_id = ?) " +
+                "WHERE category_id = ?) " +
                 "SELECT COUNT(*) " +
                 "FROM shop_products " +
                 "INNER JOIN updated_products " +
-                    "USING(product_id)";
+                "USING(product_id)";
         count += jdbcTemplate.queryForObject(countShopProducts, Integer.class, categoryId);
 
         return 1 + count;
+    }
+
+    @Override
+    public boolean categoryExists(long categoryId) {
+        String sql = "SELECT EXISTS(" +
+                "SELECT 1 " +
+                "FROM categories " +
+                "WHERE category_id = ? " +
+                "LIMIT 1)";
+
+        return jdbcTemplate.queryForObject(sql, Boolean.class, categoryId);
     }
 
     @Override
@@ -60,36 +71,36 @@ public class JdbcCategoryRepository implements  CategoryRepository{
     }
 
     @Override
-    public List<Category> getCategories(long parentId) {
+    public List<DbCategory> getCategories(long parentId) {
         String sql = "SELECT " +
-                    "parent_id, " +
-                    "category_id, " +
-                    "name, " +
-                    "img_location " +
+                "parent_id, " +
+                "category_id, " +
+                "name, " +
+                "img_location " +
                 "FROM categories " +
                 "WHERE " +
-                    "parent_id = ? AND " +
-                    "removed = FALSE";
+                "parent_id = ? AND " +
+                "removed = FALSE";
 
         return jdbcTemplate.query(
                 sql,
-                new BeanPropertyRowMapper<Category>(Category.class),
+                new BeanPropertyRowMapper<DbCategory>(DbCategory.class),
                 parentId
         );
     }
 
     @Override
-    public List<ProductInfo> getProducts(ProductQuery productQuery) {
+    public List<DbProductInfo> getProducts(ProductQuery productQuery) {
         String sql = "SELECT " +
-                    "product_id, " +
-                    "products.name AS name, " +
-                    "products.img_location AS img_location, " +
-                    "MIN(price) AS min_price, " +
-                    "MAX(price) AS max_price, " +
-                    "SUM(reviews) AS total_reviews " +
+                "product_id, " +
+                "products.name AS name, " +
+                "products.img_location AS img_location, " +
+                "MIN(price) AS min_price, " +
+                "MAX(price) AS max_price, " +
+                "SUM(reviews) AS total_reviews " +
                 "FROM products " +
                 "INNER JOIN shop_products " +
-                    "USING(product_id) " +
+                "USING(product_id) " +
                 "INNER JOIN shops " +
                     "USING(shop_id) " +
                 "INNER JOIN (" +
@@ -111,55 +122,63 @@ public class JdbcCategoryRepository implements  CategoryRepository{
 
         return jdbcTemplate.query(
                 sql,
-                new BeanPropertyRowMapper<ProductInfo>(ProductInfo.class),
+                new BeanPropertyRowMapper<DbProductInfo>(DbProductInfo.class),
                 productQuery.getQueryParameters()
         );
     }
 
     @Override
-    public long addCategory(Category category) {
+    public long addCategory(DbCategory dbCategory) {
         String sql = "INSERT INTO categories(" +
-                    "name, " +
-                    "parent_id, " +
-                    "img_location) " +
+                "name, " +
+                "parent_id, " +
+                "img_location) " +
                 "VALUES (?, ?, ?) " +
                 "RETURNING category_id";
 
-        return jdbcTemplate.queryForObject(
-                sql,
-                Long.class,
-                category.getName(),
-                category.getParentId(),
-                category.getImgLocation()
-        );
+        try {
+            return jdbcTemplate.queryForObject(
+                    sql,
+                    Long.class,
+                    dbCategory.getName(),
+                    dbCategory.getParentId(),
+                    dbCategory.getImgLocation()
+            );
+        } catch (Exception ex) {
+            return -1;
+        }
     }
 
     @Override
-    public long addCharacteristic(Characteristic characteristic) {
+    public long addCharacteristic(DbCharacteristic dbCharacteristic) {
         String sql = "INSERT INTO characteristics(" +
-                    "category_id, " +
-                    "name, " +
-                    "characteristic_value) " +
+                "category_id, " +
+                "name, " +
+                "characteristic_value) " +
                 "VALUES (?, ?, ?) " +
                 "RETURNING characteristic_id";
 
-        return jdbcTemplate.queryForObject(
-                sql,
-                Long.class,
-                characteristic.getCategoryId(),
-                characteristic.getName(),
-                characteristic.getCharacteristicValue()
-        );
+        try {
+            return jdbcTemplate.queryForObject(
+                    sql,
+                    Long.class,
+                    dbCharacteristic.getCategoryId(),
+                    dbCharacteristic.getName(),
+                    dbCharacteristic.getCharacteristicValue()
+            );
+        } catch (Exception ex) {
+            return -1;
+        }
     }
 
     @Override
-    public List<Characteristic> getCharacteristics(long categoryId) {
+    public List<DbCharacteristic> getCharacteristics(long categoryId) {
         String sql = "SELECT characteristic_id, category_id, name, characteristic_value " +
                 "FROM characteristics " +
                 "WHERE category_id = ?";
 
-        return  jdbcTemplate.query(sql,
-                new BeanPropertyRowMapper<Characteristic>(Characteristic.class),
+        return jdbcTemplate.query(sql,
+                new BeanPropertyRowMapper<DbCharacteristic>(DbCharacteristic.class),
                 categoryId);
     }
 

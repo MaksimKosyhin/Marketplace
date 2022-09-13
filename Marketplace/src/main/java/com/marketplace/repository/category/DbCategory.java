@@ -8,15 +8,9 @@ import lombok.*;
 @Setter
 @EqualsAndHashCode
 @ToString
-public class Category {
+public class DbCategory {
     private Long categoryId;
     private String name;
     private Long parentId;
     private String imgLocation;
-
-    public Category(String name, Long parentId, String imgLocation) {
-        this.name = name;
-        this.parentId = parentId;
-        this.imgLocation = imgLocation;
-    }
 }

@@ -1,5 +1,6 @@
 package com.marketplace.repository.category;
 
+import com.marketplace.service.category.SortingOption;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;

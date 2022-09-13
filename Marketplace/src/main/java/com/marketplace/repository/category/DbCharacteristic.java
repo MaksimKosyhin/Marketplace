@@ -8,13 +8,13 @@ import lombok.*;
 @Setter
 @EqualsAndHashCode
 @ToString
-public class Characteristic {
+public class DbCharacteristic {
     private Long characteristicId;
     private Long categoryId;
     private String name;
     private String characteristicValue;
 
-    public Characteristic(Long categoryId, String name, String characteristicValue) {
+    public DbCharacteristic(Long categoryId, String name, String characteristicValue) {
         this.categoryId = categoryId;
         this.name = name;
         this.characteristicValue = characteristicValue;

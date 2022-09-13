@@ -12,8 +12,12 @@ import java.nio.file.Paths;
 public class ImageLoader {
     private final Path imgDirectory = Paths.get("img");
 
-    public String save(byte[] content, Path destination) throws IOException {
-        Path fullPath = imgDirectory.resolve(destination);
+    public String save(byte[] content, String... dirs) throws IOException {
+        Path fullPath = imgDirectory;
+
+        for (String dir : dirs) {
+            fullPath.resolve(dir);
+        }
 
         Files.createDirectories(fullPath.getParent());
         Files.write(fullPath, content);

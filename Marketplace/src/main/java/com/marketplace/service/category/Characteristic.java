@@ -11,8 +11,14 @@ import java.util.Map;
 @EqualsAndHashCode
 @ToString
 public class Characteristic {
+
     private String name;
     private Map<Long, String> values;
+
+    public Characteristic(String name) {
+        this.name = name;
+        values = new HashMap<>();
+    }
 
     public Characteristic(String name, Map<Long, String> values) {
         this.name = name;

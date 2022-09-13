@@ -15,6 +15,7 @@ import com.marketplace.repository.order.OrderRepository;
 
 import com.marketplace.service.category.CategoryService;
 import com.marketplace.service.category.CategoryServiceImpl;
+import com.marketplace.util.CategoryMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -24,9 +25,9 @@ public class AppConfig {
 
     @Bean
     public CategoryService categoryService(
-            CategoryRepository categoryRepository, ImageLoader imageLoader) {
+            CategoryRepository categoryRepository, CategoryMapper categoryMapper) {
 
-        return new CategoryServiceImpl(categoryRepository, imageLoader);
+        return new CategoryServiceImpl(categoryRepository, categoryMapper);
     }
 
     @Bean

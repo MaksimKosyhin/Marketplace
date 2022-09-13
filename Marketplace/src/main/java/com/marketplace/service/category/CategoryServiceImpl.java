@@ -9,49 +9,20 @@ import com.marketplace.repository.category.DbCharacteristic;
 import com.marketplace.repository.category.ProductQuery;
 import com.marketplace.config.exception.NonExistingEntityException;
 import com.marketplace.config.exception.ParentCategoryException;
+import com.marketplace.util.CategoryMapper;
 
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
-    private final ImageLoader imageLoader;
+    private final CategoryMapper categoryMapper;
 
-    public CategoryServiceImpl(CategoryRepository categoryRepository, ImageLoader imageLoader) {
+    public CategoryServiceImpl(CategoryRepository categoryRepository, CategoryMapper categoryMapper) {
         this.categoryRepository = categoryRepository;
-        this.imageLoader = imageLoader;
-    }
-
-    private Map<String, Set<DbCharacteristic>> getGroupedByName(long categoryId) {
-        return categoryRepository.getCharacteristics(categoryId)
-                .stream()
-                .collect(
-                        Collectors.groupingBy(
-                                DbCharacteristic::getName,
-                                Collectors.toSet()
-                        )
-                );
-    }
-
-    private Characteristic combineCharacteristicValues(Set<DbCharacteristic> set) {
-        Characteristic result = new Characteristic();
-        for (DbCharacteristic c : set) {
-            result.getValues().put(
-                    c.getCharacteristicId(),
-                    c.getCharacteristicValue()
-            );
-        }
-        return result;
-    }
-
-    private List<Characteristic> combineCharacteristicValues(Map<String, Set<DbCharacteristic>> map) {
-        return map.entrySet()
-                .stream()
-                .map(entry -> combineCharacteristicValues(entry.getValue()))
-                .collect(Collectors.toList());
+        this.categoryMapper = categoryMapper;
     }
 
     @Override
@@ -66,17 +37,7 @@ public class CategoryServiceImpl implements CategoryService {
                     "parent category for this category does not exist");
         }
 
-        String imgLocation = imageLoader.save(
-                category.getImgData(),
-                Paths.get("category", category.getName())
-        );
-
-        DbCategory dbCategory = new DbCategory(
-                category.getCategoryId(),
-                category.getName(),
-                category.getParentId(),
-                imgLocation
-        );
+        DbCategory dbCategory = categoryMapper.toDbCategory(category);
 
         if (categoryRepository.addCategory(dbCategory) == -1) {
             throw new AddEntryException("category was not added");
@@ -93,13 +54,7 @@ public class CategoryServiceImpl implements CategoryService {
 
         return categoryRepository.getCategories(parentId)
                 .stream()
-                .map(dbCategory -> new Category(
-                        dbCategory.getCategoryId(),
-                        dbCategory.getName(),
-                        imageLoader.findInFileSystem(
-                                dbCategory.getImgLocation()
-                        )
-                ))
+                .map(categoryMapper::toCategory)
                 .collect(Collectors.toList());
     }
 
@@ -122,19 +77,14 @@ public class CategoryServiceImpl implements CategoryService {
             throw new ParentCategoryException("This category includes other categories");
         } else if (!categoryRepository.categoryExists(productQuery.getCategoryId())) {
             throw new NonExistingEntityException("Category does not exist");
-        }
+        } else {
+            categoryMapper.toProductInfo(null);
 
-        return categoryRepository.getProducts(productQuery)
-                .stream()
-                .map(dbProductInfo -> new ProductInfo(
-                        dbProductInfo.getProductId(),
-                        dbProductInfo.getName(),
-                        imageLoader.findInFileSystem(dbProductInfo.getImgLocation()),
-                        dbProductInfo.getMinPrice(),
-                        dbProductInfo.getMaxPrice(),
-                        dbProductInfo.getTotalReviews())
-                )
-                .collect(Collectors.toList());
+            return categoryRepository.getProducts(productQuery)
+                    .stream()
+                    .map(categoryMapper::toProductInfo)
+                    .collect(Collectors.toList());
+        }
     }
 
     @Override
@@ -156,5 +106,36 @@ public class CategoryServiceImpl implements CategoryService {
         } else {
             throw new NonExistingEntityException("Category does not exist");
         }
+    }
+
+    private List<Characteristic> combineCharacteristicValues(Map<String, Set<DbCharacteristic>> map) {
+        return map.entrySet()
+                .stream()
+                .map(this::combineCharacteristicValues)
+                .collect(Collectors.toList());
+    }
+
+    private Characteristic combineCharacteristicValues(Map.Entry<String, Set<DbCharacteristic>> entry) {
+        Characteristic result = new Characteristic(entry.getKey());
+
+        for (DbCharacteristic c : entry.getValue()) {
+            result.getValues().put(
+                    c.getCharacteristicId(),
+                    c.getCharacteristicValue()
+            );
+        }
+
+        return result;
+    }
+
+    private Map<String, Set<DbCharacteristic>> getGroupedByName(long categoryId) {
+        return categoryRepository.getCharacteristics(categoryId)
+                .stream()
+                .collect(
+                        Collectors.groupingBy(
+                                DbCharacteristic::getName,
+                                Collectors.toSet()
+                        )
+                );
     }
 }

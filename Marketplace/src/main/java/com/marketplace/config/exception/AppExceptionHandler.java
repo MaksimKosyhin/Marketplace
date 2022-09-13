@@ -11,12 +11,17 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @ControllerAdvice
 public class AppExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(value = {NonExistingEntityException.class})
-    public ResponseEntity<?> handleDBEntryNotFound(NonExistingEntityException ex, WebRequest request) {
+    public ResponseEntity<?> handleEntityNotExist(NonExistingEntityException ex, WebRequest request) {
         return super.handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), HttpStatus.NOT_FOUND, request);
     }
 
     @ExceptionHandler(value = {ParentCategoryException.class})
-    public ResponseEntity<?> handleUserAlreadyExists(ParentCategoryException ex, WebRequest request) {
+    public ResponseEntity<?> handleParentNotExist(ParentCategoryException ex, WebRequest request) {
+        return super.handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), HttpStatus.NOT_FOUND, request);
+    }
+
+    @ExceptionHandler(value = {AddEntryException.class})
+    public ResponseEntity<?> handleEntryNotAdded(AddEntryException ex, WebRequest request) {
         return super.handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), HttpStatus.NOT_FOUND, request);
     }
 }

@@ -136,13 +136,17 @@ public class JdbcCategoryRepository implements  CategoryRepository{
                 "VALUES (?, ?, ?) " +
                 "RETURNING category_id";
 
-        return jdbcTemplate.queryForObject(
-                sql,
-                Long.class,
-                dbCategory.getName(),
-                dbCategory.getParentId(),
-                dbCategory.getImgLocation()
-        );
+        try {
+            return jdbcTemplate.queryForObject(
+                    sql,
+                    Long.class,
+                    dbCategory.getName(),
+                    dbCategory.getParentId(),
+                    dbCategory.getImgLocation()
+            );
+        } catch (Exception ex) {
+            return -1;
+        }
     }
 
     @Override
@@ -154,13 +158,17 @@ public class JdbcCategoryRepository implements  CategoryRepository{
                 "VALUES (?, ?, ?) " +
                 "RETURNING characteristic_id";
 
-        return jdbcTemplate.queryForObject(
-                sql,
-                Long.class,
-                dbCharacteristic.getCategoryId(),
-                dbCharacteristic.getName(),
-                dbCharacteristic.getCharacteristicValue()
-        );
+        try {
+            return jdbcTemplate.queryForObject(
+                    sql,
+                    Long.class,
+                    dbCharacteristic.getCategoryId(),
+                    dbCharacteristic.getName(),
+                    dbCharacteristic.getCharacteristicValue()
+            );
+        } catch (Exception ex) {
+            return -1;
+        }
     }
 
     @Override

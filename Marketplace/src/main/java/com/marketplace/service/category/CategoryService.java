@@ -9,15 +9,15 @@ import java.util.List;
 public interface CategoryService {
     public boolean isParentCategory(long categoryId);
 
-    public long addCategory(Category category) throws IOException;
+    public void addCategory(Category category) throws IOException;
 
     public List<Category> getCategories(long parentId) throws Exception;
 
-    public boolean removeCategory(long categoryId);
+    public void removeCategory(long categoryId);
 
     public List<ProductInfo> getProducts(ProductQuery productQuery);
 
-    public long addCharacteristic(DbCharacteristic dbCharacteristic);
+    public void addCharacteristic(DbCharacteristic dbCharacteristic);
 
     public List<Characteristic> getCharacteristics(long categoryId);
 }

@@ -1,6 +1,8 @@
 package com.marketplace.service.category;
 
 import com.marketplace.config.ImageLoader;
+import com.marketplace.config.exception.AddEntryException;
+import com.marketplace.config.exception.ModifyingEntryException;
 import com.marketplace.repository.category.CategoryRepository;
 import com.marketplace.repository.category.DbCategory;
 import com.marketplace.repository.category.DbCharacteristic;
@@ -13,12 +15,12 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class JdbcCategoryService implements CategoryService {
+public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final ImageLoader imageLoader;
 
-    public JdbcCategoryService(CategoryRepository categoryRepository, ImageLoader imageLoader) {
+    public CategoryServiceImpl(CategoryRepository categoryRepository, ImageLoader imageLoader) {
         this.categoryRepository = categoryRepository;
         this.imageLoader = imageLoader;
     }
@@ -48,9 +50,7 @@ public class JdbcCategoryService implements CategoryService {
     private List<Characteristic> combineCharacteristicValues(Map<String, Set<DbCharacteristic>> map) {
         return map.entrySet()
                 .stream()
-                .map(entry -> {
-                    return combineCharacteristicValues(entry.getValue());
-                })
+                .map(entry -> combineCharacteristicValues(entry.getValue()))
                 .collect(Collectors.toList());
     }
 
@@ -60,14 +60,13 @@ public class JdbcCategoryService implements CategoryService {
     }
 
     @Override
-    public long addCategory(Category category) throws IOException {
-
+    public void addCategory(Category category) throws IOException {
         if (!categoryRepository.categoryExists(category.getParentId())) {
             throw new NonExistingEntityException(
                     "parent category for this category does not exist");
         }
 
-        String img_location = imageLoader.save(
+        String imgLocation = imageLoader.save(
                 category.getImgData(),
                 Paths.get("category", category.getName())
         );
@@ -76,10 +75,12 @@ public class JdbcCategoryService implements CategoryService {
                 category.getCategoryId(),
                 category.getName(),
                 category.getParentId(),
-                img_location
+                imgLocation
         );
 
-        return categoryRepository.addCategory(dbCategory);
+        if (categoryRepository.addCategory(dbCategory) == -1) {
+            throw new AddEntryException("category was not added");
+        }
     }
 
     @Override
@@ -103,14 +104,24 @@ public class JdbcCategoryService implements CategoryService {
     }
 
     @Override
-    public boolean removeCategory(long categoryId) {
-        return categoryRepository.removeCategory(categoryId);
+    public void removeCategory(long categoryId) {
+        if (!categoryRepository.categoryExists(categoryId)) {
+            throw new NonExistingEntityException(
+                    String.format("Category with id: doesn't exist", categoryId)
+            );
+        } else if (!categoryRepository.removeCategory(categoryId)) {
+            throw new ModifyingEntryException(
+                    String.format("Category with id: %d was not modified", categoryId)
+            );
+        }
     }
 
     @Override
     public List<ProductInfo> getProducts(ProductQuery productQuery) {
         if (categoryRepository.isParentCategory(productQuery.getCategoryId())) {
             throw new ParentCategoryException("This category includes other categories");
+        } else if (!categoryRepository.categoryExists(productQuery.getCategoryId())) {
+            throw new NonExistingEntityException("Category does not exist");
         }
 
         return categoryRepository.getProducts(productQuery)
@@ -127,9 +138,11 @@ public class JdbcCategoryService implements CategoryService {
     }
 
     @Override
-    public long addCharacteristic(DbCharacteristic dbCharacteristic) {
+    public void addCharacteristic(DbCharacteristic dbCharacteristic) {
         if (categoryRepository.categoryExists(dbCharacteristic.getCategoryId())) {
-            return categoryRepository.addCharacteristic(dbCharacteristic);
+            if (categoryRepository.addCharacteristic(dbCharacteristic) == -1) {
+                throw new ModifyingEntryException("Characteristic was not added");
+            }
         } else {
             throw new NonExistingEntityException(
                     "category for this characteristic does not exist");
@@ -138,8 +151,10 @@ public class JdbcCategoryService implements CategoryService {
 
     @Override
     public List<Characteristic> getCharacteristics(long categoryId) {
-        return combineCharacteristicValues(
-                getGroupedByName(categoryId)
-        );
+        if (categoryRepository.categoryExists(categoryId)) {
+            return combineCharacteristicValues(getGroupedByName(categoryId));
+        } else {
+            throw new NonExistingEntityException("Category does not exist");
+        }
     }
 }

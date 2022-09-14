@@ -8,14 +8,14 @@ import lombok.*;
 @Setter
 @EqualsAndHashCode
 @ToString
-public class Product {
-    private long product_id;
-    private long category_id;
+public class DbProduct {
+    private long productId;
+    private long categoryId;
     private String name;
     private String imgLocation;
 
-    public Product(long category_id, String name, String imgLocation) {
-        this.category_id = category_id;
+    public DbProduct(long categoryId, String name, String imgLocation) {
+        this.categoryId = categoryId;
         this.name = name;
         this.imgLocation = imgLocation;
     }

@@ -62,7 +62,7 @@ public class CategoryServiceImpl implements CategoryService {
     public void removeCategory(long categoryId) {
         if (!categoryRepository.categoryExists(categoryId)) {
             throw new NonExistingEntityException(
-                    String.format("Category with id: doesn't exist", categoryId)
+                    String.format("Category with id: %d doesn't exist", categoryId)
             );
         } else if (!categoryRepository.removeCategory(categoryId)) {
             throw new ModifyingEntryException(

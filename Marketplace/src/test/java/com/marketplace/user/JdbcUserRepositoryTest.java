@@ -1,6 +1,6 @@
 package com.marketplace.user;
 
-import com.marketplace.repository.user.User;
+import com.marketplace.repository.user.DbUser;
 import com.marketplace.repository.user.UserRepository;
 import com.marketplace.repository.user.UserRole;
 import org.junit.jupiter.api.AfterEach;
@@ -49,41 +49,41 @@ class JdbcUserRepositoryTest {
         jdbcTemplate.update("TRUNCATE TABLE categories, users, shops CASCADE");
     }
 
-    private void addUserForTest(User user) {
+    private void addUserForTest(DbUser dbUser) {
         String sql = "INSERT INTO users(username, password, role) " +
                 "VALUES(?,?,CAST(? AS user_role))";
         jdbcTemplate.update(
                 sql,
-                user.getUsername(),
-                user.getPassword(),
-                user.getRole().name()
+                dbUser.getUsername(),
+                dbUser.getPassword(),
+                dbUser.getRole().name()
         );
     }
 
     @Test
     void addsUser() {
         //given
-        User user = new User("Max", "12345", UserRole.ADMIN);
+        DbUser dbUser = new DbUser("Max", "12345", UserRole.ADMIN);
 
         //when
-        userRepository.addUser(user);
+        userRepository.addUser(dbUser);
 
         //then
         assertThat(jdbcTemplate.queryForObject(
-                        "SELECT EXISTS(SELECT 1 FROM users WHERE username = ?)",
-                        Boolean.class,
-                        user.getUsername()))
+                "SELECT EXISTS(SELECT 1 FROM users WHERE username = ?)",
+                Boolean.class,
+                dbUser.getUsername()))
                 .isTrue();
     }
 
     @Test
     void getUser() {
         //given
-        User user = new User("Max", "12345", UserRole.ADMIN);
-        addUserForTest(user);
+        DbUser dbUser = new DbUser("Max", "12345", UserRole.ADMIN);
+        addUserForTest(dbUser);
 
         //then
-        assertThat(userRepository.getUser(user.getUsername()))
-                .isEqualTo(user);
+        assertThat(userRepository.getUser(dbUser.getUsername()))
+                .isEqualTo(dbUser);
     }
 }

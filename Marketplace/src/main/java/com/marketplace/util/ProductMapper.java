@@ -34,14 +34,11 @@ public class ProductMapper {
         return shopProduct;
     }
 
-    public DbProduct toDbProduct(ProductInfo productInfo) throws IOException {
+    public DbProduct toDbProduct(ProductInfo productInfo) {
         DbProduct dbProduct = new DbProduct();
 
         dbProduct.setName(dbProduct.getName());
         dbProduct.setCategoryId(dbProduct.getCategoryId());
-        String imgLocation =
-                imageLoader.save(productInfo.getImgData(), "product", productInfo.getName());
-        dbProduct.setImgLocation(imgLocation);
 
         return dbProduct;
     }

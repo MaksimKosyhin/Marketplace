@@ -27,13 +27,21 @@ import org.springframework.jdbc.core.JdbcTemplate;
 public class AppConfig {
 
     @Bean
-    public ProductService productService(ProductRepository repository, ProductMapper mapper) {
-        return new ProductServiceImpl(repository, mapper);
+    public ProductService productService(
+            ProductRepository repository,
+            ProductMapper mapper,
+            ImageLoader imageLoader) {
+
+        return new ProductServiceImpl(repository, mapper, imageLoader);
     }
 
     @Bean
-    public CategoryService categoryService(CategoryRepository repository, CategoryMapper mapper) {
-        return new CategoryServiceImpl(repository, mapper);
+    public CategoryService categoryService(
+            CategoryRepository repository,
+            CategoryMapper mapper,
+            ImageLoader imageLoader) {
+
+        return new CategoryServiceImpl(repository, mapper, imageLoader);
     }
 
     @Bean

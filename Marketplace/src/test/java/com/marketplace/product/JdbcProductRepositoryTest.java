@@ -19,7 +19,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-class JdbcDbProductRepositoryTestDescriptionDescriptionInfo {
+class JdbcProductRepositoryTest {
 
     private final JdbcTemplate jdbcTemplate;
     private final ProductRepository productRepository;
@@ -29,7 +29,7 @@ class JdbcDbProductRepositoryTestDescriptionDescriptionInfo {
                     .withReuse(true);
 
     @Autowired
-    JdbcDbProductRepositoryTestDescriptionDescriptionInfo(JdbcTemplate jdbcTemplate, ProductRepository productRepository) {
+    JdbcProductRepositoryTest(JdbcTemplate jdbcTemplate, ProductRepository productRepository) {
         this.jdbcTemplate = jdbcTemplate;
         this.productRepository = productRepository;
     }

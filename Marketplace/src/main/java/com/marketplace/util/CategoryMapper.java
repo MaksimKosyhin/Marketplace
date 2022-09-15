@@ -29,18 +29,11 @@ public class CategoryMapper {
         return category;
     }
 
-    public DbCategory toDbCategory(Category category) throws IOException {
+    public DbCategory toDbCategory(Category category) {
         DbCategory dbCategory = new DbCategory();
 
         dbCategory.setName(category.getName());
         dbCategory.setParentId(category.getParentId());
-
-        String imgLocation = imageLoader.save(
-                category.getImgData(),
-                "category",
-                category.getName()
-        );
-        dbCategory.setImgLocation(imgLocation);
 
         return dbCategory;
     }

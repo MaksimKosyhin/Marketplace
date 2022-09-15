@@ -1,5 +1,6 @@
 package com.marketplace.service.product;
 
+import com.marketplace.config.ImageLoader;
 import com.marketplace.config.exception.AddEntryException;
 import com.marketplace.config.exception.ModifyingEntryException;
 import com.marketplace.config.exception.NonExistingEntityException;
@@ -13,10 +14,12 @@ public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository repository;
     private final ProductMapper mapper;
+    private final ImageLoader imageLoader;
 
-    public ProductServiceImpl(ProductRepository repository, ProductMapper mapper) {
+    public ProductServiceImpl(ProductRepository repository, ProductMapper mapper, ImageLoader imageLoader) {
         this.repository = repository;
         this.mapper = mapper;
+        this.imageLoader = imageLoader;
     }
 
     @Override
@@ -35,11 +38,18 @@ public class ProductServiceImpl implements ProductService {
 
     @Transactional
     @Override
-    public void addProduct(ProductInfo productInfo) throws IOException {
+    public void addProduct(ProductInfo productInfo) {
         DbProduct dbProduct = mapper.toDbProduct(productInfo);
 
-        long productId = repository.addProduct(dbProduct);
+        String imgLocation;
+        try {
+            imgLocation = imageLoader.save(productInfo.getImgData(), "product", productInfo.getName());
+        } catch (IOException ex) {
+            throw new ModifyingEntryException(ex.getMessage());
+        }
+        dbProduct.setImgLocation(imgLocation);
 
+        long productId = repository.addProduct(dbProduct);
         if (productId == -1) {
             throw new AddEntryException("product was not added");
         }
@@ -58,15 +68,13 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void addShopProduct(ShopProductInfo shopProductInfo) {
-        ShopProduct shopProduct = mapper.toShopProduct(shopProductInfo);
-
+    public void addShopProduct(ShopProduct shopProduct) {
         if (!repository.addShopProduct(shopProduct)) {
             throw new ModifyingEntryException(
                     String.format(
                             "product with id: %d wasn't added to shop with id: %d",
-                            shopProductInfo.getProductId(),
-                            shopProductInfo.getShopId())
+                            shopProduct.getProductId(),
+                            shopProduct.getShopId())
             );
         }
     }

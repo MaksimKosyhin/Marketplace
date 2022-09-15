@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class JdbcOrderRepositoryTest {
+class JdbcOrderServiceTest {
 
     @Test
     void addOrder() {

@@ -10,6 +10,5 @@ import lombok.*;
 @ToString
 public class Shop {
     private String name;
-    private String link;
     private String imgLocation;
 }

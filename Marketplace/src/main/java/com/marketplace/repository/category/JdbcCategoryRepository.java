@@ -53,7 +53,9 @@ public class JdbcCategoryRepository implements  CategoryRepository{
         String sql = "SELECT EXISTS(" +
                 "SELECT 1 " +
                 "FROM categories " +
-                "WHERE category_id = ? " +
+                "WHERE " +
+                "category_id = ? AND " +
+                "removed = FALSE " +
                 "LIMIT 1)";
 
         return jdbcTemplate.queryForObject(sql, Boolean.class, categoryId);

@@ -71,8 +71,8 @@ class JdbcProductRepositoryTest {
     }
 
     private long addShopForTest(String name) {
-        String insertProduct = "INSERT INTO shops(name, link, img_location) " +
-                "VALUES(?,'','')";
+        String insertProduct = "INSERT INTO shops(name, img_location) " +
+                "VALUES(?,'')";
         jdbcTemplate.update(insertProduct, name);
 
         String lastShopId = "SELECT MAX(shop_id) FROM shops";
@@ -80,12 +80,13 @@ class JdbcProductRepositoryTest {
     }
 
     private void addShopProductForTest(ShopProduct shopProduct) {
-        String insertShopProduct = "INSERT INTO shop_products(shop_id, product_id, score, price, reviews) " +
-                "VALUES(?,?,?,?,?)";
+        String insertShopProduct = "INSERT INTO shop_products(shop_id, product_id, link, score, price, reviews) " +
+                "VALUES(?,?,?,?,?,?)";
         jdbcTemplate.update(
                 insertShopProduct,
                 shopProduct.getShopId(),
                 shopProduct.getProductId(),
+                shopProduct.getLink(),
                 shopProduct.getScore(),
                 shopProduct.getPrice(),
                 shopProduct.getReviews()

@@ -8,7 +8,7 @@ import lombok.*;
 @Setter
 @EqualsAndHashCode
 @ToString
-public class User {
+public class DbUser {
     private String username;
     private String password;
     private UserRole role;

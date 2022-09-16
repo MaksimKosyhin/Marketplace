@@ -8,7 +8,7 @@ import lombok.*;
 @Setter
 @EqualsAndHashCode
 @ToString
-public class ProductIncome {
+public class DbProductIncome {
     private long productId;
     private String name;
     private String imgLocation;

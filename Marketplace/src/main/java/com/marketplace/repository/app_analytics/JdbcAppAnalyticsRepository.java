@@ -19,33 +19,35 @@ public class JdbcAppAnalyticsRepository implements  AppAnalyticsRepository{
         String sql = "SELECT SUM((price * amount)) AS income " +
                 "FROM shop_products " +
                 "INNER JOIN order_shop_products " +
-                    "USING(product_id) " +
+                "USING(product_id) " +
                 "INNER JOIN orders " +
-                    "USING(order_id) " +
+                "USING(order_id) " +
                 "WHERE " +
-                    "registration_date > ? AND " +
-                    "registration_date < ?";
+                "registration_date > ? AND " +
+                "registration_date < ?";
 
-        return  jdbcTemplate.queryForObject(sql, Integer.class, from, to);
+        Integer sum = jdbcTemplate.queryForObject(sql, Integer.class, from, to);
+
+        return sum == null ? 0 : sum;
     }
 
     @Override
-    public List<CategoryIncome> getCategoriesIncome(LocalDate from, LocalDate to) {
+    public List<DbCategoryIncome> getCategoriesIncome(LocalDate from, LocalDate to) {
         String sql = "SELECT " +
-                    "category_id, " +
-                    "name, " +
-                    "img_location, " +
-                    "categories.removed AS removed" +
-                    "SUM((price * amount)) AS income " +
+                "categories.category_id AS category_id, " +
+                "categories.name AS name, " +
+                "categories.img_location AS img_location, " +
+                "categories.removed AS removed, " +
+                "SUM(price * amount) AS income " +
                 "FROM categories " +
                 "INNER JOIN products " +
-                    "USING(category_id) " +
+                "USING(category_id) " +
                 "INNER JOIN shop_products " +
-                    "USING(product_id) " +
+                "USING(product_id) " +
                 "INNER JOIN order_shop_products " +
-                    "USING(product_id) " +
+                "USING(product_id) " +
                 "INNER JOIN orders " +
-                    "USING(order_id)" +
+                "USING(order_id)" +
                 "WHERE " +
                     "registration_date > ? AND " +
                     "registration_date < ?  " +
@@ -53,38 +55,73 @@ public class JdbcAppAnalyticsRepository implements  AppAnalyticsRepository{
 
         return jdbcTemplate.query(
                 sql,
-                new BeanPropertyRowMapper<CategoryIncome>(CategoryIncome.class),
+                new BeanPropertyRowMapper<DbCategoryIncome>(DbCategoryIncome.class),
                 from,
                 to
         );
     }
 
     @Override
-    public List<ProductIncome> getProductsIncome(ProductIncomeQuery productIncomeQuery) {
+    public List<DbProductIncome> getProductsIncomeForAllShops(ProductIncomeQuery query) {
         String sql = "SELECT " +
-                    "product_id, " +
-                    "name, " +
-                    "img_location, " +
-                    "COUNT(order_id) AS number_of_orders, " +
-                    "SUM((price * amount)) AS income " +
-                    "removed " +
+                "product_id, " +
+                "name, " +
+                "img_location, " +
+                "COUNT(order_id) AS number_of_orders, " +
+                "SUM(price * amount) AS income, " +
+                "products.removed AS removed " +
                 "FROM products " +
                 "INNER JOIN shop_products " +
-                    "USING(product_id) " +
+                "USING(product_id) " +
                 "INNER JOIN order_shop_products " +
-                    "USING(product_id) " +
+                "USING(product_id) " +
+                "INNER JOIN orders " +
+                "USING(order_id)" +
                 "WHERE " +
-                    "category_id = ? AND " +
-                    "registration_date > ? AND " +
-                    "registration_date < ? " +
+                "category_id = ? AND " +
+                "registration_date > ? AND " +
+                "registration_date < ? " +
                 "GROUP BY product_id";
 
         return jdbcTemplate.query(
                 sql,
-                new BeanPropertyRowMapper<ProductIncome>(ProductIncome.class),
-                productIncomeQuery.getCategoryId(),
-                productIncomeQuery.getFrom(),
-                productIncomeQuery.getTo()
+                new BeanPropertyRowMapper<DbProductIncome>(DbProductIncome.class),
+                query.getCategoryId(),
+                query.getFrom(),
+                query.getTo()
+        );
+    }
+
+    @Override
+    public List<DbProductIncome> getProductsIncomeForShop(ProductIncomeQuery query) {
+        String sql = "SELECT " +
+                "product_id, " +
+                "name, " +
+                "img_location, " +
+                "COUNT(order_id) AS number_of_orders, " +
+                "SUM(price * amount) AS income, " +
+                "products.removed AS removed " +
+                "FROM products " +
+                "INNER JOIN shop_products " +
+                "USING(product_id) " +
+                "INNER JOIN order_shop_products " +
+                "USING(product_id) " +
+                "INNER JOIN orders " +
+                "USING(order_id)" +
+                "WHERE " +
+                "category_id = ? AND " +
+                "registration_date > ? AND " +
+                "registration_date < ? AND " +
+                "shop_products.shop_id = ? " +
+                "GROUP BY product_id";
+
+        return jdbcTemplate.query(
+                sql,
+                new BeanPropertyRowMapper<DbProductIncome>(DbProductIncome.class),
+                query.getCategoryId(),
+                query.getFrom(),
+                query.getTo(),
+                query.getShopId()
         );
     }
 
@@ -93,7 +130,7 @@ public class JdbcAppAnalyticsRepository implements  AppAnalyticsRepository{
         String sql = "SELECT shop_id, name " +
                 "FROM shops " +
                 "INNER JOIN category_shops " +
-                    "USING(shop_id) " +
+                "USING(shop_id) " +
                 "WHERE category_id = ?";
 
         return jdbcTemplate.query(

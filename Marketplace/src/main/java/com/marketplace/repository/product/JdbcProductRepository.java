@@ -31,15 +31,26 @@ public class JdbcProductRepository implements  ProductRepository{
     }
 
     @Override
-    public Product getProduct(long productId) {
+    public boolean productExists(long productId) {
+        String sql = "SELECT EXISTS(" +
+                "SELECT 1 " +
+                "FROM product " +
+                "WHERE product_id = ? " +
+                "LIMIT 1)";
+
+        return jdbcTemplate.queryForObject(sql, Boolean.class, productId);
+    }
+
+    @Override
+    public DbProduct getProduct(long productId) {
         String sql = "SELECT " +
-                    "product_id, " +
-                    "name, " +
-                    "img_location " +
+                "product_id, " +
+                "name, " +
+                "img_location " +
                 "FROM products " +
                 "WHERE product_id = ?";
 
-        return jdbcTemplate.queryForObject(sql, Product.class, productId);
+        return jdbcTemplate.queryForObject(sql, DbProduct.class, productId);
     }
 
     @Override
@@ -84,21 +95,25 @@ public class JdbcProductRepository implements  ProductRepository{
     }
 
     @Override
-    public long addProduct(Product product) {
+    public long addProduct(DbProduct dbProduct) {
         String sql = "INSERT INTO products(" +
-                    "category_id, " +
-                    "name, " +
-                    "img_location) " +
+                "category_id, " +
+                "name, " +
+                "img_location) " +
                 "VALUES(?,?,?) " +
                 "RETURNING product_id";
 
-        return jdbcTemplate.queryForObject(
-                sql,
-                Long.class,
-                product.getCategory_id(),
-                product.getName(),
-                product.getImgLocation()
-        );
+        try {
+            return jdbcTemplate.queryForObject(
+                    sql,
+                    Long.class,
+                    dbProduct.getCategoryId(),
+                    dbProduct.getName(),
+                    dbProduct.getImgLocation()
+            );
+        } catch (Exception ex) {
+            return -1;
+        }
     }
 
     @Override
@@ -126,19 +141,23 @@ public class JdbcProductRepository implements  ProductRepository{
     @Override
     public long addShop(Shop shop) {
         String sql = "INSERT INTO shops(" +
-                    "name, " +
-                    "link, " +
-                    "img_location) " +
+                "name, " +
+                "link, " +
+                "img_location) " +
                 "VALUES(?,?,?) " +
                 "RETURNING shop_id";
 
-        return jdbcTemplate.queryForObject(
-                sql,
-                Long.class,
-                shop.getName(),
-                shop.getLink(),
-                shop.getImgLocation()
-        );
+        try {
+            return jdbcTemplate.queryForObject(
+                    sql,
+                    Long.class,
+                    shop.getName(),
+                    shop.getLink(),
+                    shop.getImgLocation()
+            );
+        } catch (Exception ex) {
+            return -1;
+        }
     }
 
     @Override

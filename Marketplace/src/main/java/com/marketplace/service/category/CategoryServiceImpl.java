@@ -19,10 +19,15 @@ public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
+    private final ImageLoader imageLoader;
 
-    public CategoryServiceImpl(CategoryRepository categoryRepository, CategoryMapper categoryMapper) {
+    public CategoryServiceImpl(CategoryRepository categoryRepository,
+                               CategoryMapper categoryMapper,
+                               ImageLoader imageLoader) {
+
         this.categoryRepository = categoryRepository;
         this.categoryMapper = categoryMapper;
+        this.imageLoader = imageLoader;
     }
 
     @Override
@@ -31,13 +36,26 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public void addCategory(Category category) throws IOException {
+    public void addCategory(Category category) {
         if (!categoryRepository.categoryExists(category.getParentId())) {
             throw new NonExistingEntityException(
                     "parent category for this category does not exist");
         }
 
         DbCategory dbCategory = categoryMapper.toDbCategory(category);
+
+        String imgLocation;
+
+        try {
+            imgLocation = imageLoader.save(
+                    category.getImgData(),
+                    "category",
+                    category.getName()
+            );
+        } catch (IOException ex) {
+            throw new AddEntryException(ex.getMessage());
+        }
+        dbCategory.setImgLocation(imgLocation);
 
         if (categoryRepository.addCategory(dbCategory) == -1) {
             throw new AddEntryException("category was not added");
@@ -62,7 +80,7 @@ public class CategoryServiceImpl implements CategoryService {
     public void removeCategory(long categoryId) {
         if (!categoryRepository.categoryExists(categoryId)) {
             throw new NonExistingEntityException(
-                    String.format("Category with id: doesn't exist", categoryId)
+                    String.format("Category with id: %d doesn't exist", categoryId)
             );
         } else if (!categoryRepository.removeCategory(categoryId)) {
             throw new ModifyingEntryException(
@@ -78,8 +96,6 @@ public class CategoryServiceImpl implements CategoryService {
         } else if (!categoryRepository.categoryExists(productQuery.getCategoryId())) {
             throw new NonExistingEntityException("Category does not exist");
         } else {
-            categoryMapper.toProductInfo(null);
-
             return categoryRepository.getProducts(productQuery)
                     .stream()
                     .map(categoryMapper::toProductInfo)

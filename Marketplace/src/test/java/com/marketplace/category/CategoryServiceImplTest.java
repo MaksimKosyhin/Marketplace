@@ -32,6 +32,9 @@ class CategoryServiceImplTest {
     @Mock
     private CategoryMapper categoryMapper;
 
+    @Mock
+    private ImageLoader imageLoader;
+
     @InjectMocks
     @Autowired
     private CategoryServiceImpl categoryService;

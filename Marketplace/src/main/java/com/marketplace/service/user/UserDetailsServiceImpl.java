@@ -44,8 +44,14 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     public void addUser(DbUser user) {
-        if (repository.addUser(user) == -1) {
-            throw new AddEntryException("new user was not added");
+
+        if (repository.userExists(user.getUsername())) {
+            throw new AddEntryException(
+                    String.format("user with username: %s already exists"));
+        } else {
+            if (repository.addUser(user) == -1) {
+                throw new AddEntryException("new user was not added");
+            }
         }
     }
 }

@@ -6,11 +6,22 @@ import org.springframework.jdbc.core.RowMapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class JdbcUserRepository implements UserRepository{
+public class JdbcUserRepository implements UserRepository {
     private final JdbcTemplate jdbcTemplate;
 
     public JdbcUserRepository(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
+    }
+
+    @Override
+    public boolean userExists(String username) {
+        String sql = "SELECT EXISTS(" +
+                "SELECT 1 " +
+                "FROM users " +
+                "WHERE username = ? " +
+                "LIMIT 1)";
+
+        return jdbcTemplate.queryForObject(sql, Boolean.class, username);
     }
 
     @Override

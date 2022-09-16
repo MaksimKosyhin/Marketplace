@@ -12,6 +12,7 @@ import java.time.LocalDate;
 @ToString
 public class ProductIncomeQuery {
     private long categoryId;
+    private long shopId;
     private LocalDate from;
     private LocalDate to;
 }

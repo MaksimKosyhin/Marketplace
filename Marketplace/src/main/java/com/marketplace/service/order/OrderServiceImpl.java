@@ -1,7 +1,9 @@
 package com.marketplace.service.order;
 
+import com.marketplace.config.ImageLoader;
 import com.marketplace.config.exception.AddEntryException;
 import com.marketplace.config.exception.ModifyingEntryException;
+import com.marketplace.repository.order.DbOrderedProduct;
 import com.marketplace.repository.order.OrderQuery;
 import com.marketplace.repository.order.OrderRepository;
 import com.marketplace.util.OrderMapper;
@@ -17,10 +19,12 @@ public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository repository;
     private final OrderMapper mapper;
+    private final ImageLoader imageLoader;
 
-    public OrderServiceImpl(OrderRepository repository, OrderMapper mapper) {
+    public OrderServiceImpl(OrderRepository repository, OrderMapper mapper, ImageLoader imageLoader) {
         this.repository = repository;
         this.mapper = mapper;
+        this.imageLoader = imageLoader;
     }
 
 
@@ -42,7 +46,7 @@ public class OrderServiceImpl implements OrderService {
 
         return repository.getOrder(userId, orderId)
                 .stream()
-                .map(product -> mapper.toOrderedProduct(product))
+                .map(this::toOrderedProduct)
                 .collect(Collectors.toList());
     }
 
@@ -54,19 +58,28 @@ public class OrderServiceImpl implements OrderService {
                 .stream()
                 .collect(
                         () -> new TreeMap<LocalDate, List<OrderedProduct>>(LocalDate::compareTo),
-                        (map, product) -> {
-                            if (map.containsKey(product.getRegistrationDate())) {
-                                map.get(product.getRegistrationDate())
-                                        .add(mapper.toOrderedProduct(product));
-                            } else {
-                                List<OrderedProduct> products = new ArrayList<>();
-                                products.add(mapper.toOrderedProduct(product));
-
-                                map.put(product.getRegistrationDate(), products);
-                            }
-                        },
+                        this::addOrderedProductToMap,
                         Map::putAll
                 );
+    }
+
+    private void addOrderedProductToMap(Map<LocalDate, List<OrderedProduct>> map, DbOrderedProduct dbProduct) {
+        map.computeIfAbsent(
+                dbProduct.getRegistrationDate(),
+                list -> new ArrayList<OrderedProduct>());
+
+        map.get(dbProduct.getRegistrationDate()).add(toOrderedProduct(dbProduct));
+    }
+
+    private OrderedProduct toOrderedProduct(DbOrderedProduct dbProduct) {
+        OrderedProduct product = mapper.toOrderedProduct(dbProduct);
+
+        product.setProductImgResource(
+                imageLoader.toFileSystemResource(dbProduct.getProductImgLocation()));
+        product.setShopImgResource(
+                imageLoader.toFileSystemResource(dbProduct.getShopImgLocation()));
+
+        return product;
     }
 
     @Override

@@ -23,7 +23,7 @@ public class CategoryMapper {
         category.setCategoryId(dbCategory.getCategoryId());
         category.setName(dbCategory.getName());
         category.setImgResource(
-                imageLoader.findInFileSystem(
+                imageLoader.toFileSystemResource(
                         dbCategory.getImgLocation()));
 
         return category;
@@ -50,7 +50,7 @@ public class CategoryMapper {
 
         productInfo.setProductId(dbProductInfo.getProductId());
         productInfo.setName(dbProductInfo.getName());
-        productInfo.setImgResource(imageLoader.findInFileSystem(dbProductInfo.getImgLocation()));
+        productInfo.setImgResource(imageLoader.toFileSystemResource(dbProductInfo.getImgLocation()));
         productInfo.setMinPrice(dbProductInfo.getMinPrice());
         productInfo.setMaxPrice(productInfo.getMaxPrice());
         productInfo.setTotalReviews(dbProductInfo.getTotalReviews());

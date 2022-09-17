@@ -119,17 +119,19 @@ public class JdbcProductRepository implements  ProductRepository{
     @Override
     public boolean addShopProduct(ShopProduct shopProduct) {
         String sql = "INSERT INTO shop_products(" +
-                    "shop_id, " +
-                    "product_id, " +
-                    "score, " +
-                    "price, " +
-                    "reviews) " +
+                "shop_id, " +
+                "product_id, " +
+                "link, " +
+                "score, " +
+                "price, " +
+                "reviews) " +
                 "VALUES(?,?,?,?,?)";
 
         int updated = jdbcTemplate.update(
                 sql,
                 shopProduct.getShopId(),
                 shopProduct.getProductId(),
+                shopProduct.getLink(),
                 shopProduct.getScore(),
                 shopProduct.getPrice(),
                 shopProduct.getReviews()
@@ -143,8 +145,8 @@ public class JdbcProductRepository implements  ProductRepository{
         String sql = "INSERT INTO shops(" +
                 "name, " +
                 "link, " +
-                "img_location) " +
-                "VALUES(?,?,?) " +
+                ") " +
+                "VALUES(?,?) " +
                 "RETURNING shop_id";
 
         try {
@@ -152,7 +154,6 @@ public class JdbcProductRepository implements  ProductRepository{
                     sql,
                     Long.class,
                     shop.getName(),
-                    shop.getLink(),
                     shop.getImgLocation()
             );
         } catch (Exception ex) {

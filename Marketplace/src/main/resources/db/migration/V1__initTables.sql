@@ -47,7 +47,6 @@ CREATE TABLE shops
   (
      shop_id      INT GENERATED always AS IDENTITY,
      name         VARCHAR(90) NOT NULL,
-     link         VARCHAR(90) NOT NULL,
      img_location VARCHAR(255) NOT NULL,
      removed      BOOLEAN DEFAULT FALSE,
      PRIMARY KEY(shop_id)
@@ -66,6 +65,7 @@ CREATE TABLE shop_products
   (
      shop_id    INT,
      product_id INT,
+     link       VARCHAR(255) NOT NULL,
      score      INT NOT NULL,
      price      INT NOT NULL,
      reviews    INT NOT NULL,

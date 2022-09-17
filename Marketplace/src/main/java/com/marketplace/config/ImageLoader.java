@@ -25,7 +25,7 @@ public class ImageLoader {
         return fullPath.toAbsolutePath().toString();
     }
 
-    public FileSystemResource findInFileSystem(String location) {
+    public FileSystemResource toFileSystemResource(String location) {
         try {
             return new FileSystemResource(Paths.get(location));
         } catch (Exception e) {

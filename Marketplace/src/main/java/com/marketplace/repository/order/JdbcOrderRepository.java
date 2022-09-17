@@ -32,17 +32,17 @@ public class JdbcOrderRepository implements OrderRepository{
     }
 
     @Override
-    public List<OrderedProduct> getOrder(long userId, long orderId) {
+    public List<DbOrderedProduct> getOrder(long userId, long orderId) {
         String sql = "SELECT " +
-                    "orders.order_id AS order_id, " +
-                    "products.product_id AS product_id, " +
-                    "shops.shop_id AS shop_id" +
-                    "products.name AS product_name, " +
-                    "products.img_location AS product_img_location, " +
-                    "amount, " +
-                    "price, " +
-                    "shops.name AS shop_name, " +
-                    "shops.img_location AS shop_img_location " +
+                "orders.order_id AS order_id, " +
+                "products.product_id AS product_id, " +
+                "shops.shop_id AS shop_id" +
+                "products.name AS product_name, " +
+                "products.img_location AS product_img_location, " +
+                "amount, " +
+                "price, " +
+                "shops.name AS shop_name, " +
+                "shops.img_location AS shop_img_location " +
                 "FROM orders " +
                 "INNER JOIN order_shop_products " +
                     "USING order_id " +
@@ -58,39 +58,41 @@ public class JdbcOrderRepository implements OrderRepository{
 
         return jdbcTemplate.query(
                 sql,
-                new BeanPropertyRowMapper<OrderedProduct>(OrderedProduct.class),
+                new BeanPropertyRowMapper<DbOrderedProduct>(DbOrderedProduct.class),
                 userId,
                 orderId
         );
     }
 
     @Override
-    public List<OrderedProduct> getAllOrders(long userId) {
+    public List<DbOrderedProduct> getAllOrders(long userId) {
         String sql = "SELECT " +
-                    "orders.order_id AS order_id, " +
-                    "products.product_id AS product_id, " +
-                    "shops.shop_id AS shop_id" +
-                    "products.name AS product_name, " +
-                    "products.img_location AS product_img_location, " +
-                    "amount, " +
-                    "price, " +
-                    "shops.name AS shop_name, " +
-                    "shops.img_location AS shop_img_location " +
+                "orders.order_id AS order_id, " +
+                "products.product_id AS product_id, " +
+                "shops.shop_id AS shop_id, " +
+                "registration_date, " +
+                "products.name AS product_name, " +
+                "products.img_location AS product_img_location, " +
+                "amount, " +
+                "price, " +
+                "shops.name AS shop_name, " +
+                "shops.img_location AS shop_img_location " +
                 "FROM orders " +
                 "INNER JOIN order_shop_products " +
-                    "USING order_id " +
+                "USING order_id " +
                 "INNER JOIN shop_products " +
-                    "USING shop_id " +
+                "USING shop_id " +
                 "INNER JOIN products " +
-                    "USING product_id " +
+                "USING product_id " +
                 "INNER JOIN shops " +
-                    "USING shop_id " +
+                "USING shop_id " +
                 "WHERE " +
-                    "user_id = ?";
+                "user_id = ? AND " +
+                "registration_date != NULL";
 
         return jdbcTemplate.query(
                 sql,
-                new BeanPropertyRowMapper<OrderedProduct>(OrderedProduct.class),
+                new BeanPropertyRowMapper<DbOrderedProduct>(DbOrderedProduct.class),
                 userId
         );
     }
@@ -156,12 +158,9 @@ public class JdbcOrderRepository implements OrderRepository{
     public long getCurrentOrderId(String username) {
         String sql = "SELECT MAX(order_id) " +
                 "FROM orders " +
-                "WHERE user_id = " +
-                    "(SELECT user_id " +
-                    "FROM users " +
-                    "WHERE username = ?)";
+                "WHERE user_id = ?";
 
-        return jdbcTemplate.queryForObject(sql, Long.class, username);
+        return jdbcTemplate.queryForObject(sql, Long.class, getUserId(username));
     }
 
     @Override

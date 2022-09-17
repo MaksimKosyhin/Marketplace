@@ -65,10 +65,9 @@ public class OrderServiceImpl implements OrderService {
 
     private void addOrderedProductToMap(Map<LocalDate, List<OrderedProduct>> map, DbOrderedProduct dbProduct) {
         map.computeIfAbsent(
-                dbProduct.getRegistrationDate(),
-                list -> new ArrayList<OrderedProduct>());
-
-        map.get(dbProduct.getRegistrationDate()).add(toOrderedProduct(dbProduct));
+                        dbProduct.getRegistrationDate(),
+                        list -> new ArrayList<OrderedProduct>())
+                .add(toOrderedProduct(dbProduct));
     }
 
     private OrderedProduct toOrderedProduct(DbOrderedProduct dbProduct) {

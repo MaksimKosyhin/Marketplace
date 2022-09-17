@@ -3,10 +3,7 @@ package com.marketplace.service.category;
 import com.marketplace.config.ImageLoader;
 import com.marketplace.config.exception.AddEntryException;
 import com.marketplace.config.exception.ModifyingEntryException;
-import com.marketplace.repository.category.CategoryRepository;
-import com.marketplace.repository.category.DbCategory;
-import com.marketplace.repository.category.DbCharacteristic;
-import com.marketplace.repository.category.ProductQuery;
+import com.marketplace.repository.category.*;
 import com.marketplace.config.exception.NonExistingEntityException;
 import com.marketplace.config.exception.ParentCategoryException;
 import com.marketplace.util.CategoryMapper;
@@ -72,8 +69,18 @@ public class CategoryServiceImpl implements CategoryService {
 
         return categoryRepository.getCategories(parentId)
                 .stream()
-                .map(categoryMapper::toCategory)
+                .map(this::toCategory)
                 .collect(Collectors.toList());
+    }
+
+    private Category toCategory(DbCategory dbCategory) {
+        Category category = categoryMapper.toCategory(dbCategory);
+
+        category.setImgResource(
+                imageLoader.findInFileSystem(
+                        dbCategory.getImgLocation()));
+
+        return category;
     }
 
     @Override
@@ -98,9 +105,15 @@ public class CategoryServiceImpl implements CategoryService {
         } else {
             return categoryRepository.getProducts(productQuery)
                     .stream()
-                    .map(categoryMapper::toProductInfo)
+                    .map(this::toProductInfo)
                     .collect(Collectors.toList());
         }
+    }
+
+    private ProductInfo toProductInfo(DbProductInfo dbInfo) {
+        ProductInfo info = categoryMapper.toProductInfo(dbInfo);
+        info.setImgResource(imageLoader.findInFileSystem(dbInfo.getImgLocation()));
+        return info;
     }
 
     @Override

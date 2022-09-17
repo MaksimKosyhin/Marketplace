@@ -8,30 +8,26 @@ import com.marketplace.service.app_analytics.ProductIncome;
 
 public class AppAnalyticsMapper {
 
-    private final ImageLoader loader;
-
-    public AppAnalyticsMapper(ImageLoader loader) {
-        this.loader = loader;
-    }
-
     public ProductIncome toProductIncome(DbProductIncome dbIncome) {
-        return new ProductIncome(
-                dbIncome.getProductId(),
-                dbIncome.getName(),
-                loader.findInFileSystem(dbIncome.getImgLocation()),
-                dbIncome.getNumberOfOrders(),
-                dbIncome.getIncome(),
-                dbIncome.isRemoved()
-        );
+        ProductIncome income = new ProductIncome();
+
+        income.setProductId(dbIncome.getProductId());
+        income.setName(dbIncome.getName());
+        income.setNumberOfOrders(dbIncome.getNumberOfOrders());
+        income.setIncome(dbIncome.getIncome());
+        income.setRemoved(dbIncome.isRemoved());
+
+        return income;
     }
 
     public CategoryIncome toCategoryIncome(DbCategoryIncome dbIncome) {
-        return new CategoryIncome(
-                dbIncome.getCategoryId(),
-                dbIncome.getName(),
-                loader.findInFileSystem(dbIncome.getImgLocation()),
-                dbIncome.getIncome(),
-                dbIncome.isRemoved()
-        );
+        CategoryIncome income = new CategoryIncome();
+
+        income.setCategoryId(dbIncome.getCategoryId());
+        income.setName(dbIncome.getName());
+        income.setIncome(dbIncome.getIncome());
+        income.setRemoved(dbIncome.isRemoved());
+
+        return income;
     }
 }

@@ -11,20 +11,12 @@ import java.io.IOException;
 
 @Component
 public class CategoryMapper {
-    private final ImageLoader imageLoader;
-
-    public CategoryMapper(ImageLoader imageLoader) {
-        this.imageLoader = imageLoader;
-    }
 
     public Category toCategory(DbCategory dbCategory) {
         Category category = new Category();
 
         category.setCategoryId(dbCategory.getCategoryId());
         category.setName(dbCategory.getName());
-        category.setImgResource(
-                imageLoader.findInFileSystem(
-                        dbCategory.getImgLocation()));
 
         return category;
     }
@@ -43,7 +35,6 @@ public class CategoryMapper {
 
         productInfo.setProductId(dbProductInfo.getProductId());
         productInfo.setName(dbProductInfo.getName());
-        productInfo.setImgResource(imageLoader.findInFileSystem(dbProductInfo.getImgLocation()));
         productInfo.setMinPrice(dbProductInfo.getMinPrice());
         productInfo.setMaxPrice(productInfo.getMaxPrice());
         productInfo.setTotalReviews(dbProductInfo.getTotalReviews());

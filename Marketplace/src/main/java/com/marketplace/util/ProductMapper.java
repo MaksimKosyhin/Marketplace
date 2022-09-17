@@ -16,12 +16,6 @@ import java.util.List;
 @Component
 public class ProductMapper {
 
-    private final ImageLoader imageLoader;
-
-    public ProductMapper(ImageLoader imageLoader) {
-        this.imageLoader = imageLoader;
-    }
-
     public ShopProduct toShopProduct(ShopProductInfo shopProductInfo) {
         ShopProduct shopProduct = new ShopProduct();
 
@@ -45,7 +39,6 @@ public class ProductMapper {
 
     public ProductDescription toProductDescription(
             DbProduct dbProduct,
-            List<ShopProduct> shopProducts,
             List<ProductCharacteristic> characteristics) {
 
         ProductDescription productDescription = new ProductDescription();
@@ -54,17 +47,11 @@ public class ProductMapper {
         productDescription.setProductId(dbProduct.getProductId());
         productDescription.setCategoryId(dbProduct.getCategoryId());
         productDescription.setCharacteristics(characteristics);
-        productDescription.setImgResource(
-                imageLoader.findInFileSystem(dbProduct.getImgLocation()));
-
-        shopProducts.stream()
-                .map(this::toShopProductDescription)
-                .forEach(shops -> productDescription.getShops().add(shops));
 
         return productDescription;
     }
 
-    private ShopProductDescription toShopProductDescription(ShopProduct shopProduct) {
+    public ShopProductDescription toShopProductDescription(ShopProduct shopProduct) {
         ShopProductDescription shopProductDescription = new ShopProductDescription();
 
         shopProductDescription.setName(shopProduct.getName());
@@ -72,8 +59,6 @@ public class ProductMapper {
         shopProductDescription.setPrice(shopProduct.getPrice());
         shopProductDescription.setReviews(shopProduct.getReviews());
         shopProductDescription.setScore(shopProduct.getScore());
-        shopProductDescription.setResource(
-                imageLoader.findInFileSystem(shopProduct.getImgLocation()));
 
         return shopProductDescription;
     }

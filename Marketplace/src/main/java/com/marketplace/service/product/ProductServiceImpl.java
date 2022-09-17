@@ -9,6 +9,8 @@ import com.marketplace.util.ProductMapper;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class ProductServiceImpl implements ProductService {
 
@@ -29,11 +31,33 @@ public class ProductServiceImpl implements ProductService {
                     String.format("product with id: %d doesn't exist", productId));
         }
 
-        return mapper.toProductDescription(
-                repository.getProduct(productId),
-                repository.getShopProducts(productId),
+        DbProduct product = repository.getProduct(productId);
+
+        ProductDescription description = mapper.toProductDescription(
+                product,
                 repository.getProductCharacteristics(productId)
         );
+
+        description.setImgResource(
+                imageLoader.findInFileSystem(product.getImgLocation()));
+
+        List<ShopProductDescription> shops = repository.getShopProducts(productId)
+                .stream()
+                .map(this::toShopProductDescription)
+                .collect(Collectors.toList());
+
+        description.setShops(shops);
+
+        return description;
+    }
+
+    private ShopProductDescription toShopProductDescription(ShopProduct shopProduct) {
+        ShopProductDescription description = mapper.toShopProductDescription(shopProduct);
+
+        description.setResource(
+                imageLoader.findInFileSystem(shopProduct.getImgLocation()));
+
+        return description;
     }
 
     @Transactional

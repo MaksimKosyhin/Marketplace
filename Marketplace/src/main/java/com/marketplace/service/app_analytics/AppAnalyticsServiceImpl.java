@@ -1,9 +1,7 @@
 package com.marketplace.service.app_analytics;
 
-import com.marketplace.repository.app_analytics.AppAnalyticsRepository;
-import com.marketplace.repository.app_analytics.DbProductIncome;
-import com.marketplace.repository.app_analytics.ProductIncomeQuery;
-import com.marketplace.repository.app_analytics.Shop;
+import com.marketplace.config.ImageLoader;
+import com.marketplace.repository.app_analytics.*;
 import com.marketplace.util.AppAnalyticsMapper;
 
 import java.time.LocalDate;
@@ -13,10 +11,12 @@ import java.util.stream.Collectors;
 public class AppAnalyticsServiceImpl implements AppAnalyticsService {
     private final AppAnalyticsRepository repository;
     private final AppAnalyticsMapper mapper;
+    private final ImageLoader loader;
 
-    public AppAnalyticsServiceImpl(AppAnalyticsRepository repository, AppAnalyticsMapper mapper) {
+    public AppAnalyticsServiceImpl(AppAnalyticsRepository repository, AppAnalyticsMapper mapper, ImageLoader loader) {
         this.repository = repository;
         this.mapper = mapper;
+        this.loader = loader;
     }
 
     @Override
@@ -28,8 +28,14 @@ public class AppAnalyticsServiceImpl implements AppAnalyticsService {
     public List<CategoryIncome> getCategoriesIncome(LocalDate from, LocalDate to) {
         return repository.getCategoriesIncome(from, to)
                 .stream()
-                .map(mapper::toCategoryIncome)
+                .map(this::toCategoryIncome)
                 .collect(Collectors.toList());
+    }
+
+    private CategoryIncome toCategoryIncome(DbCategoryIncome dbIncome) {
+        CategoryIncome income = mapper.toCategoryIncome(dbIncome);
+        income.setImgResource(loader.findInFileSystem(dbIncome.getImgLocation()));
+        return income;
     }
 
     @Override
@@ -44,8 +50,15 @@ public class AppAnalyticsServiceImpl implements AppAnalyticsService {
 
         return incomes
                 .stream()
-                .map(mapper::toProductIncome)
+                .map(this::toProductIncome)
                 .collect(Collectors.toList());
+    }
+
+    private ProductIncome toProductIncome(DbProductIncome dbIncome) {
+        ProductIncome income = mapper.toProductIncome(dbIncome);
+        income.setImgResource(
+                loader.findInFileSystem(dbIncome.getImgLocation()));
+        return income;
     }
 
     @Override

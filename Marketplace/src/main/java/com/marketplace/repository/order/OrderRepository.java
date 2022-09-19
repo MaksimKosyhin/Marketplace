@@ -5,7 +5,7 @@ import java.util.List;
 public interface OrderRepository {
     public long addOrder(long userId);
 
-    public List<DbOrderedProduct> getOrder(long userId, long orderId);
+    public List<DbOrderedProduct> getOrder(long orderId);
 
     public List<DbOrderedProduct> getAllOrders(long userId);
 

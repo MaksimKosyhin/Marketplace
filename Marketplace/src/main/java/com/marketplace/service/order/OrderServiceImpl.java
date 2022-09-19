@@ -41,10 +41,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderedProduct> getCurrentOrder(String username) {
-        long userId = repository.getUserId(username);
         long orderId = repository.getCurrentOrderId(username);
 
-        return repository.getOrder(userId, orderId)
+        return repository.getOrder(orderId)
                 .stream()
                 .map(this::toOrderedProduct)
                 .collect(Collectors.toList());

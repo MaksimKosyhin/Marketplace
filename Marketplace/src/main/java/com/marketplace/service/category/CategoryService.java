@@ -2,6 +2,7 @@ package com.marketplace.service.category;
 
 import com.marketplace.repository.category.DbCharacteristic;
 import com.marketplace.repository.category.ProductQuery;
+import com.marketplace.repository.category.Shop;
 
 import java.io.IOException;
 import java.util.List;
@@ -14,6 +15,10 @@ public interface CategoryService {
     public List<Category> getCategories(long parentId) throws Exception;
 
     public void removeCategory(long categoryId);
+
+    public void addShopToCategory(long shop_id, long category_id);
+
+    public List<Shop> getShops(long categoryId);
 
     public List<ProductInfo> getProducts(ProductQuery productQuery);
 

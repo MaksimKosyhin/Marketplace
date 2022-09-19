@@ -1,5 +1,6 @@
 package com.marketplace.repository.category;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
@@ -128,6 +129,25 @@ public class JdbcCategoryRepository implements  CategoryRepository{
         } catch (Exception ex) {
             return -1;
         }
+    }
+
+    @Override
+    public boolean addShopToCategory(long shopId, long categoryId) {
+        String sql = "INSERT INTO category_shops(shop_id, category_id) " +
+                "VALUES(?,?)";
+
+        return 1 == template.update(sql, shopId, categoryId);
+    }
+
+    @Override
+    public List<Shop> getShops(long categoryId) {
+        String sql = "SELECT shop_id, name " +
+                "FROM shops " +
+                "INNER JOIN category_shops " +
+                "USING(shop_id) " +
+                "WHERE category_id = ?";
+
+        return template.query(sql, new BeanPropertyRowMapper<Shop>(Shop.class), categoryId);
     }
 
     @Override

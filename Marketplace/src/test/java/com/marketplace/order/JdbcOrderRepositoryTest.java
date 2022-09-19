@@ -80,7 +80,7 @@ public class JdbcOrderRepositoryTest {
 
     @Test
     public void returnProductsOfOrder() {
-        assertThat(repository.getOrder(1, 1)).isEqualTo(
+        assertThat(repository.getOrder( 1)).isEqualTo(
                 List.of(
                         new DbOrderedProduct(
                                 1,

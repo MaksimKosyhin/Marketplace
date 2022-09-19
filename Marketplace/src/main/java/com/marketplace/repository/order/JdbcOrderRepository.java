@@ -32,34 +32,30 @@ public class JdbcOrderRepository implements OrderRepository{
     }
 
     @Override
-    public List<DbOrderedProduct> getOrder(long userId, long orderId) {
+    public List<DbOrderedProduct> getOrder(long orderId) {
         String sql = "SELECT " +
-                "orders.order_id AS order_id, " +
-                "products.product_id AS product_id, " +
-                "shops.shop_id AS shop_id, " +
-                "products.name AS product_name, " +
-                "products.img_location AS product_img_location, " +
-                "amount, " +
-                "price, " +
-                "shops.name AS shop_name, " +
-                "shops.img_location AS shop_img_location " +
-                "FROM orders " +
-                "INNER JOIN order_shop_products " +
-                    "USING(order_id) " +
+                    "order_id, " +
+                    "products.product_id AS product_id, " +
+                    "shops.shop_id AS shop_id, " +
+                    "products.name AS product_name, " +
+                    "products.img_location AS product_img_location, " +
+                    "amount, " +
+                    "price, " +
+                    "shops.name AS shop_name, " +
+                    "shops.img_location AS shop_img_location " +
+                "FROM products " +
                 "INNER JOIN shop_products " +
-                    "USING(shop_id) " +
-                "INNER JOIN products " +
                     "USING(product_id) " +
                 "INNER JOIN shops " +
-                    "USING(shop_id) " +
+                    "USING(shop_id)" +
+                "INNER JOIN order_shop_products " +
+                    "USING(product_id) " +
                 "WHERE " +
-                    "user_id = ? AND " +
                     "order_id = ?";
 
         return jdbcTemplate.query(
                 sql,
                 new BeanPropertyRowMapper<DbOrderedProduct>(DbOrderedProduct.class),
-                userId,
                 orderId
         );
     }

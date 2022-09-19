@@ -15,6 +15,10 @@ public interface CategoryRepository {
 
     public long addCategory(DbCategory dbCategory);
 
+    public boolean addShopToCategory(long shopId, long categoryId);
+
+    public List<Shop> getShops(long categoryId);
+
     public long addCharacteristic(DbCharacteristic dbCharacteristic);
 
     public List<DbCharacteristic> getCharacteristics(long categoryId);

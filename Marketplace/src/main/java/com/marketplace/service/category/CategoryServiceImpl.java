@@ -77,7 +77,7 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = categoryMapper.toCategory(dbCategory);
 
         category.setImgResource(
-                imageLoader.findInFileSystem(
+                imageLoader.toFileSystemResource(
                         dbCategory.getImgLocation()));
 
         return category;
@@ -112,7 +112,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     private ProductInfo toProductInfo(DbProductInfo dbInfo) {
         ProductInfo info = categoryMapper.toProductInfo(dbInfo);
-        info.setImgResource(imageLoader.findInFileSystem(dbInfo.getImgLocation()));
+        info.setImgResource(imageLoader.toFileSystemResource(dbInfo.getImgLocation()));
         return info;
     }
 

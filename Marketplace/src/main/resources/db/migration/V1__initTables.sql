@@ -1,13 +1,13 @@
 CREATE TABLE categories
   (
      category_id     INT GENERATED always AS IDENTITY,
-     name            VARCHAR(50),
+     name            VARCHAR(50) NOT NULL,
      parent_id       INT,
      img_location    VARCHAR(255) NOT NULL,
      removed         BOOLEAN DEFAULT FALSE,
      PRIMARY KEY(category_id),
      CONSTRAINT fk_parent_category FOREIGN KEY(parent_id) REFERENCES categories(
-     category_id)
+     category_id) ON DELETE CASCADE
   );
 
 CREATE TABLE products

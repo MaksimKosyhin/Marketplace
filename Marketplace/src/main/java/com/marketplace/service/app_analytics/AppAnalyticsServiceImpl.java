@@ -34,7 +34,7 @@ public class AppAnalyticsServiceImpl implements AppAnalyticsService {
 
     private CategoryIncome toCategoryIncome(DbCategoryIncome dbIncome) {
         CategoryIncome income = mapper.toCategoryIncome(dbIncome);
-        income.setImgResource(loader.findInFileSystem(dbIncome.getImgLocation()));
+        income.setImgResource(loader.toFileSystemResource(dbIncome.getImgLocation()));
         return income;
     }
 
@@ -57,7 +57,7 @@ public class AppAnalyticsServiceImpl implements AppAnalyticsService {
     private ProductIncome toProductIncome(DbProductIncome dbIncome) {
         ProductIncome income = mapper.toProductIncome(dbIncome);
         income.setImgResource(
-                loader.findInFileSystem(dbIncome.getImgLocation()));
+                loader.toFileSystemResource(dbIncome.getImgLocation()));
         return income;
     }
 

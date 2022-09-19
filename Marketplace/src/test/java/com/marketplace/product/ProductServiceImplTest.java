@@ -50,7 +50,6 @@ public class ProductServiceImplTest {
         //then
         verify(mapper).toProductDescription(
                 any(),
-                any(),
                 any()
         );
 

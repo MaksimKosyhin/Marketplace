@@ -21,7 +21,7 @@ public class JdbcOrderRepository implements OrderRepository{
                 "SET registration_date = CURRENT_DATE " +
                 "WHERE " +
                     "user_id = ? AND " +
-                    "order_id = (SELECT MAX(order_id) FROM orders";
+                    "order_id = (SELECT MAX(order_id) FROM orders)";
         jdbcTemplate.update(updateLastOrder, userId);
 
         String addOrder = "INSERT INTO orders(user_id) " +
@@ -36,7 +36,7 @@ public class JdbcOrderRepository implements OrderRepository{
         String sql = "SELECT " +
                 "orders.order_id AS order_id, " +
                 "products.product_id AS product_id, " +
-                "shops.shop_id AS shop_id" +
+                "shops.shop_id AS shop_id, " +
                 "products.name AS product_name, " +
                 "products.img_location AS product_img_location, " +
                 "amount, " +
@@ -45,13 +45,13 @@ public class JdbcOrderRepository implements OrderRepository{
                 "shops.img_location AS shop_img_location " +
                 "FROM orders " +
                 "INNER JOIN order_shop_products " +
-                    "USING order_id " +
+                    "USING(order_id) " +
                 "INNER JOIN shop_products " +
-                    "USING shop_id " +
+                    "USING(shop_id) " +
                 "INNER JOIN products " +
-                    "USING product_id " +
+                    "USING(product_id) " +
                 "INNER JOIN shops " +
-                    "USING shop_id " +
+                    "USING(shop_id) " +
                 "WHERE " +
                     "user_id = ? AND " +
                     "order_id = ?";
@@ -79,13 +79,13 @@ public class JdbcOrderRepository implements OrderRepository{
                 "shops.img_location AS shop_img_location " +
                 "FROM orders " +
                 "INNER JOIN order_shop_products " +
-                "USING order_id " +
+                "USING(order_id) " +
                 "INNER JOIN shop_products " +
-                "USING shop_id " +
+                "USING(shop_id) " +
                 "INNER JOIN products " +
-                "USING product_id " +
+                "USING(product_id) " +
                 "INNER JOIN shops " +
-                "USING shop_id " +
+                "USING(shop_id) " +
                 "WHERE " +
                 "user_id = ? AND " +
                 "registration_date != NULL";

@@ -30,14 +30,15 @@ public class ProductQuery {
     }
 
     public Object[] getQueryParameters() {
-        Object[] parameters = new Object[characteristics.length + 3];
-        for(int i = 0; i < characteristics.length; i++) {
-            parameters[i] = characteristics[i];
-        }
-        parameters[characteristics.length] = categoryId;
-        parameters[characteristics.length + 1] = startId;
-        parameters[characteristics.length + 2] = size;
+        Object[] params = new Object[characteristics.length + 3];
 
-        return  parameters;
+        params[0] = categoryId;
+        params[1] = startId;
+        for(int i = 0; i < characteristics.length; i++) {
+            params[i + 2] = characteristics[i];
+        }
+        params[params.length-1] = size;
+
+        return  params;
     }
 }

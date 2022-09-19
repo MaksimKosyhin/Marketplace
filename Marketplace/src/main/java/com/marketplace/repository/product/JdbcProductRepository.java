@@ -34,7 +34,7 @@ public class JdbcProductRepository implements  ProductRepository{
     public boolean productExists(long productId) {
         String sql = "SELECT EXISTS(" +
                 "SELECT 1 " +
-                "FROM product " +
+                "FROM products " +
                 "WHERE product_id = ? " +
                 "LIMIT 1)";
 
@@ -50,7 +50,11 @@ public class JdbcProductRepository implements  ProductRepository{
                 "FROM products " +
                 "WHERE product_id = ?";
 
-        return jdbcTemplate.queryForObject(sql, DbProduct.class, productId);
+        return jdbcTemplate.queryForObject(
+                sql,
+                new BeanPropertyRowMapper<DbProduct>(DbProduct.class),
+                productId
+        );
     }
 
     @Override

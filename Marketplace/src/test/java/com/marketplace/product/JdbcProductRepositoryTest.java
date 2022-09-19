@@ -1,9 +1,11 @@
 package com.marketplace.product;
 
-import com.marketplace.repository.category.DbCharacteristic;
+import com.marketplace.repository.product.DbProduct;
 import com.marketplace.repository.product.ProductCharacteristic;
 import com.marketplace.repository.product.ProductRepository;
 import com.marketplace.repository.product.ShopProduct;
+import org.flywaydb.core.Flyway;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -21,17 +23,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 class JdbcProductRepositoryTest {
 
-    private final JdbcTemplate jdbcTemplate;
-    private final ProductRepository productRepository;
+    private final JdbcTemplate template;
+    private final ProductRepository repository;
+    private final Flyway flyway;
 
     private static PostgreSQLContainer container =
-            (PostgreSQLContainer) new PostgreSQLContainer("postgres")
+            (PostgreSQLContainer) new PostgreSQLContainer("postgres:latest")
                     .withReuse(true);
 
     @Autowired
-    JdbcProductRepositoryTest(JdbcTemplate jdbcTemplate, ProductRepository productRepository) {
-        this.jdbcTemplate = jdbcTemplate;
-        this.productRepository = productRepository;
+    JdbcProductRepositoryTest(JdbcTemplate template, ProductRepository repository, Flyway flyway) {
+        this.template = template;
+        this.repository = repository;
+        this.flyway = flyway;
     }
 
 
@@ -47,123 +51,123 @@ class JdbcProductRepositoryTest {
         container.start();
     }
 
+    @AfterAll
+    public static void close() {
+        container.stop();
+    }
+
     @AfterEach
     void tearDown() {
-        jdbcTemplate.update("TRUNCATE TABLE categories, users, shops CASCADE");
+        flyway.clean();
+        flyway.migrate();
     }
 
-    private long addCategoryForTest(String name) {
-        String insertCategory = "INSERT INTO categories(name, parent_id, img_location) " +
-                "VALUES(?, NULL, '')";
-        jdbcTemplate.update(insertCategory, name);
+   @Test
+   public void existingProductExists() {
+        assertThat(repository.productExists(1)).isTrue();
+   }
 
-        String lastCategoryId = "SELECT MAX(category_id) FROM categories";
-        return jdbcTemplate.queryForObject(lastCategoryId, Long.class);
-    }
-
-    private long addProductForTest(long categoryId, String name) {
-        String insertProduct = "INSERT INTO products(name, category_id, img_location) " +
-                "VALUES(?,?,'')";
-        jdbcTemplate.update(insertProduct, name, categoryId);
-
-        String lastProductId = "SELECT MAX(product_id) FROM products";
-        return jdbcTemplate.queryForObject(lastProductId, Long.class);
-    }
-
-    private long addShopForTest(String name) {
-        String insertProduct = "INSERT INTO shops(name, img_location) " +
-                "VALUES(?,'')";
-        jdbcTemplate.update(insertProduct, name);
-
-        String lastShopId = "SELECT MAX(shop_id) FROM shops";
-        return jdbcTemplate.queryForObject(lastShopId, Long.class);
-    }
-
-    private void addShopProductForTest(ShopProduct shopProduct) {
-        String insertShopProduct = "INSERT INTO shop_products(shop_id, product_id, link, score, price, reviews) " +
-                "VALUES(?,?,?,?,?,?)";
-        jdbcTemplate.update(
-                insertShopProduct,
-                shopProduct.getShopId(),
-                shopProduct.getProductId(),
-                shopProduct.getLink(),
-                shopProduct.getScore(),
-                shopProduct.getPrice(),
-                shopProduct.getReviews()
+   @Test
+   public void returnsProduct() {
+        assertThat(repository.getProduct(1)).isEqualTo(
+                new DbProduct(1,0,"laptopA", "path5")
         );
+   }
 
-        shopProduct.setProductId(0);
-        shopProduct.setShopId(0);
-    }
-
-    private long addCharacteristicForTest(DbCharacteristic dbCharacteristic) {
-        String sql = "INSERT INTO characteristics(category_id, name, characteristic_value) " +
-                "VALUES(?,?,?)";
-        jdbcTemplate.update(
-                sql,
-                dbCharacteristic.getCategoryId(),
-                dbCharacteristic.getName(),
-                dbCharacteristic.getCharacteristicValue());
-
-        return jdbcTemplate.queryForObject(
-                "SELECT MAX(characteristic_id) FROM characteristics",
-                Long.class
+   @Test
+   public void returnsShopProducts() {
+        assertThat(repository.getShopProducts(1)).isEqualTo(
+                List.of(
+                        new ShopProduct(
+                                0,
+                                0,
+                                "shopA",
+                                "link1",
+                                "path8",
+                                3,
+                                4,
+                                2),
+                        new ShopProduct(
+                                0,
+                                0,
+                                "shopB",
+                                "link4",
+                                "path9",
+                                3,
+                                5,
+                                50),
+                        new ShopProduct(
+                                0,
+                                0,
+                                "shopC",
+                                "link7",
+                                "path10",
+                                4,
+                                10,
+                                15)
+                )
         );
-    }
+   }
 
-    private void addProductCharacteristicForTest(long productId, long characteristicId) {
-        String sql = "INSERT INTO product_characteristics(product_id, characteristic_id) " +
-                "VALUES(?,?)";
-        jdbcTemplate.update(sql, productId, characteristicId);
-    }
-
-    @Test
-    void returnsShopProductsOfProduct() {
-        //given
-        long fruits = addCategoryForTest("fruits");
-        long apple = addProductForTest(fruits, "apple");
-        long shopA = addShopForTest("shopA");
-        long shopB = addShopForTest("shopB");
-
-        ShopProduct appleInShopA = new ShopProduct(
-                shopA, apple, "shopA", "", "", 3, 4, 5
+   @Test
+    public void returnsProductCharacteristics() {
+        assertThat(repository.getProductCharacteristics(1)).isEqualTo(
+                List.of(new ProductCharacteristic("color", "red"))
         );
-        addShopProductForTest(appleInShopA);
+   }
 
-        ShopProduct appleInShopB = new ShopProduct(
-                shopB, apple, "shopB", "", "", 3, 4, 5
-        );
-        addShopProductForTest(appleInShopB);
+   @Test
+    public void removesProductDependentEntities() {
+       //when
+       repository.removeProduct(1);
 
-        List<ShopProduct> expected = List.of(appleInShopA, appleInShopB);
+       //then
+       assertThat(template.queryForObject(
+                    "SELECT removed " +
+                       "FROM products " +
+                       "WHERE product_id = 1", Boolean.class))
+               .isTrue();
 
-        //then
-        assertThat(productRepository.getShopProducts(apple))
-                .isEqualTo(expected);
-    }
+       assertThat(template.queryForObject(
+                    "SELECT COUNT(*) " +
+                       "FROM shop_products " +
+                       "WHERE " +
+                       "product_id = 1 AND " +
+                       "removed = FALSE", Long.class))
+               .isZero();
+   }
 
-    @Test
-    void returnsCharacteristicsOfProduct() {
-        //given
-        long fruits = addCategoryForTest("fruits");
-        long apple = addProductForTest(fruits, "apple");
-        long colorId = addCharacteristicForTest(
-                new DbCharacteristic(fruits, "color", "green"));
-        long weightId = addCharacteristicForTest(
-                new DbCharacteristic(fruits, "weight", "50g"));
+   @Test
+    public void removesShopProduct() {
+        //when
+       repository.removeShopProduct(1, 1);
 
-        addProductCharacteristicForTest(apple, colorId);
-        addProductCharacteristicForTest(apple, weightId);
+       //then
+       assertThat(template.queryForObject(
+               "SELECT removed " +
+                       "FROM shop_products " +
+                       "WHERE " +
+                       "product_id = 1 AND " +
+                       "shop_id = 1", Boolean.class)).isTrue();
+   }
 
-        ProductCharacteristic color =
-                new ProductCharacteristic("color", "green");
-        ProductCharacteristic weight =
-                new ProductCharacteristic("weight", "50g");
+   @Test
+   public void removesShopDependentEntities() {
+        //when
+       repository.removeShop(1);
 
-        List<ProductCharacteristic> expected = List.of(color, weight);
+       assertThat(template.queryForObject(
+               "SELECT removed " +
+                       "FROM shops " +
+                       "WHERE shop_id = 1", Boolean.class))
+               .isTrue();
 
-        //then
-        assertThat(productRepository.getProductCharacteristics(apple))
-                .isEqualTo(expected);
-    }
+       assertThat(template.queryForObject(
+               "SELECT COUNT(*) " +
+                       "FROM shop_products " +
+                       "WHERE " +
+                       "shop_id = 1 AND " +
+                       "removed = FALSE", Long.class))
+               .isZero();
+   }
 }

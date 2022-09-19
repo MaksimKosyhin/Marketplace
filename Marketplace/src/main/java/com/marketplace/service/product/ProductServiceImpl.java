@@ -39,7 +39,7 @@ public class ProductServiceImpl implements ProductService {
         );
 
         description.setImgResource(
-                imageLoader.findInFileSystem(product.getImgLocation()));
+                imageLoader.toFileSystemResource(product.getImgLocation()));
 
         List<ShopProductDescription> shops = repository.getShopProducts(productId)
                 .stream()
@@ -55,7 +55,7 @@ public class ProductServiceImpl implements ProductService {
         ShopProductDescription description = mapper.toShopProductDescription(shopProduct);
 
         description.setResource(
-                imageLoader.findInFileSystem(shopProduct.getImgLocation()));
+                imageLoader.toFileSystemResource(shopProduct.getImgLocation()));
 
         return description;
     }

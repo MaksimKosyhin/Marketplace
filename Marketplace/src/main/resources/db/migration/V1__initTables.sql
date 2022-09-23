@@ -4,6 +4,7 @@ CREATE TABLE categories
      name            VARCHAR(50) NOT NULL,
      parent_id       INT,
      img_location    VARCHAR(255) NOT NULL,
+     parent_category BOOLEAN NOT NULL,
      removed         BOOLEAN DEFAULT FALSE,
      PRIMARY KEY(category_id),
      CONSTRAINT fk_parent_category FOREIGN KEY(parent_id) REFERENCES categories(
@@ -75,7 +76,7 @@ CREATE TABLE shop_products
      CONSTRAINT fk_product FOREIGN KEY(product_id) REFERENCES products(product_id) ON DELETE CASCADE
   );
 
-CREATE TYPE user_role AS ENUM('ADMIN', 'MODERATOR');
+CREATE TYPE user_role AS ENUM('ADMIN', 'MODERATOR', 'USER');
 
 CREATE TABLE users
   (

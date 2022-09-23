@@ -1,3 +1,5 @@
+TRUNCATE TABLE users, categories, shops;
+
 INSERT INTO categories(name, img_location) VALUES ('electronics', 'path1');
 INSERT INTO categories(parent_id, name, img_location) VALUES (1, 'laptops', 'path2');
 INSERT INTO categories(parent_id, name, img_location) VALUES (1, 'tablets', 'path3');

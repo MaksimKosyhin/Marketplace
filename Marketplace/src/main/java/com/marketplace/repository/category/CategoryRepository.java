@@ -7,6 +7,8 @@ public interface CategoryRepository {
 
     public boolean isParentCategory(long categoryId);
 
+    public boolean containsSubcategories(long categoryId);
+
     public List<DbCategory> getCategories(long parentId);
 
     public List<DbProductInfo> getProducts(ProductQuery productQuery);
@@ -17,9 +19,10 @@ public interface CategoryRepository {
 
     public boolean addShopToCategory(long shopId, long categoryId);
 
-    public List<Shop> getShops(long categoryId);
+    public List<Shop> getShops();
 
     public long addCharacteristic(DbCharacteristic dbCharacteristic);
 
     public List<DbCharacteristic> getCharacteristics(long categoryId);
+    public List<Long> getCharacteristicsId(long categoryId);
 }

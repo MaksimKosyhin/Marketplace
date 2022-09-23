@@ -2,6 +2,7 @@ package com.marketplace.service.category;
 
 import lombok.*;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.web.multipart.MultipartFile;
 
 @NoArgsConstructor
 @Getter
@@ -12,18 +13,12 @@ public class Category {
     private long parentId;
     private long categoryId;
     private String name;
-    private byte[] imgData;
     private FileSystemResource imgResource;
+    private MultipartFile imgFile;
+    private boolean parentCategory;
 
-    public Category(long parentId, String name, byte[] imgData) {
+    public Category(long parentId) {
         this.parentId = parentId;
-        this.name = name;
-        this.imgData = imgData;
-    }
-
-    public Category(long categoryId, String name, FileSystemResource imgResource) {
-        this.categoryId = categoryId;
-        this.name = name;
-        this.imgResource = imgResource;
+        this.parentCategory = false;
     }
 }

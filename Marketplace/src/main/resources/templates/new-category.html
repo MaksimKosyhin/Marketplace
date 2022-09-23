@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Login</title>
+</head>
+<body>
+
+<div>
+    <form th:method="POST" th:action="@{/categories}" th:object="${category}" enctype="multipart/form-data">
+        <label for="name">Enter name:</label>
+        <input type="text" th:field="*{name}" id="name">
+        <br>
+        <label for="image">Choose category image</label>
+        <input type="file" id="image" name="imgFile" accept="image/*" class="form-control-file">
+        <br>
+        <label for="parentCategory">Parent Category</label>
+        <input type="checkbox" id="parentCategory" name="parentCategory" value="true">
+        <br>
+        <input type="submit" value="Add"/>
+    </form>
+</div>
+
+</body>
+</html>

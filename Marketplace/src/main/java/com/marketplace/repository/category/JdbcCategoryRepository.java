@@ -1,6 +1,6 @@
 package com.marketplace.repository.category;
 
-import org.springframework.context.annotation.Bean;
+import com.marketplace.service.category.SortingOption;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +33,19 @@ public class JdbcCategoryRepository implements  CategoryRepository{
 
     @Override
     public boolean isParentCategory(long categoryId) {
+        String sql = "SELECT parent_category " +
+                "FROM categories " +
+                "WHERE category_id = ?";
+
+        return template.queryForObject(
+                sql,
+                Boolean.class,
+                categoryId
+        );
+    }
+
+    @Override
+    public boolean containsSubcategories(long categoryId) {
         String sql = "SELECT EXISTS(" +
                 "SELECT 1 " +
                 "FROM categories " +
@@ -41,7 +54,11 @@ public class JdbcCategoryRepository implements  CategoryRepository{
                 "removed = FALSE " +
                 "LIMIT 1)";
 
-        return template.queryForObject(sql, Boolean.class, categoryId);
+        return template.queryForObject(
+                sql,
+                Boolean.class,
+                categoryId
+        );
     }
 
     @Override
@@ -95,7 +112,7 @@ public class JdbcCategoryRepository implements  CategoryRepository{
         return template.query(
                 sql,
                 new BeanPropertyRowMapper<DbProductInfo>(DbProductInfo.class),
-                productQuery.getQueryParameters()
+                getQueryParameters(productQuery)
         );
     }
 
@@ -104,9 +121,26 @@ public class JdbcCategoryRepository implements  CategoryRepository{
     }
 
     private String getOrderByStatement(ProductQuery productQuery) {
-        return "ORDER BY " +
-                converter.getColumnName(productQuery.getSortingOption()) +
-                (productQuery.isOrderDescending() ? " DESC " : " ASC ");
+        if(productQuery.getSortingOption() == SortingOption.NO_SORTING) {
+            return "";
+        } else {
+            return "ORDER BY " +
+                    converter.getColumnName(productQuery.getSortingOption()) +
+                    (productQuery.isOrderDescending() ? " DESC " : " ASC ");
+        }
+    }
+
+    private Object[] getQueryParameters(ProductQuery query) {
+        Object[] params = new Object[query.getNumberOfCharacteristics() + 3];
+
+        params[0] = query.getCategoryId();
+        params[1] = query.getStartId();
+        for(int i = 0; i < query.getNumberOfCharacteristics(); i++) {
+            params[i + 2] = query.getCharacteristicsId().get(i);
+        }
+        params[params.length-1] = query.getSize();
+
+        return  params;
     }
 
     @Override
@@ -140,14 +174,12 @@ public class JdbcCategoryRepository implements  CategoryRepository{
     }
 
     @Override
-    public List<Shop> getShops(long categoryId) {
-        String sql = "SELECT shop_id, name " +
+    public List<Shop> getShops() {
+        String sql = "SELECT category_id, shop_id, name " +
                 "FROM shops " +
-                "INNER JOIN category_shops " +
-                "USING(shop_id) " +
-                "WHERE category_id = ?";
+                "WHERE removed = FALSE";
 
-        return template.query(sql, new BeanPropertyRowMapper<Shop>(Shop.class), categoryId);
+        return template.query(sql, new BeanPropertyRowMapper<Shop>(Shop.class));
     }
 
     @Override
@@ -185,6 +217,17 @@ public class JdbcCategoryRepository implements  CategoryRepository{
         return template.query(sql,
                 new BeanPropertyRowMapper<DbCharacteristic>(DbCharacteristic.class),
                 categoryId);
+    }
+
+    @Override
+    public List<Long> getCharacteristicsId(long categoryId) {
+        String sql = "SELECT characteristic_id " +
+                "FROM product_characteristics " +
+                "INNER JOIN products " +
+                "USING(product_id) " +
+                "WHERE category_id = ?";
+
+        return template.queryForList(sql, Long.class, categoryId);
     }
 
     @Override

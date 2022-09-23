@@ -13,4 +13,5 @@ public class DbCategory {
     private String name;
     private Long parentId;
     private String imgLocation;
+    private boolean parentCategory;
 }

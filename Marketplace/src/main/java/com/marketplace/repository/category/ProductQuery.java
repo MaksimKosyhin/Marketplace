@@ -3,6 +3,9 @@ package com.marketplace.repository.category;
 import com.marketplace.service.category.SortingOption;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -11,11 +14,19 @@ import lombok.*;
 @ToString
 public class ProductQuery {
     private long categoryId;
-    private long[] characteristics;
+    private List<Long> characteristicsId;
     private SortingOption sortingOption;
     private long startId;
     private long size;
     private boolean orderDescending;
+
+    public ProductQuery(long categoryId, long size, List<Long> characteristicsId) {
+        this.categoryId = categoryId;
+        this.characteristicsId = characteristicsId;
+        this.sortingOption = SortingOption.NO_SORTING;
+        this.startId = 0;
+        this.size = size;
+    }
 
     public boolean isOrderDescending() {
         return orderDescending;
@@ -26,19 +37,6 @@ public class ProductQuery {
     }
 
     public int getNumberOfCharacteristics() {
-        return characteristics.length;
-    }
-
-    public Object[] getQueryParameters() {
-        Object[] params = new Object[characteristics.length + 3];
-
-        params[0] = categoryId;
-        params[1] = startId;
-        for(int i = 0; i < characteristics.length; i++) {
-            params[i + 2] = characteristics[i];
-        }
-        params[params.length-1] = size;
-
-        return  params;
+        return characteristicsId.size();
     }
 }

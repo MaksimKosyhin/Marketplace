@@ -142,7 +142,7 @@ public class JdbcCategoryRepositoryTest {
 
         ProductQuery query = new ProductQuery(
                 2,
-                new long[]{1},
+                List.of(1L),
                 SortingOption.PRICE,
                 0,
                 100,

@@ -2,25 +2,27 @@ package com.marketplace.config;
 
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-@Component
 public class ImageLoader {
     private final Path imgDirectory = Paths.get("img");
 
-    public String save(byte[] content, String... dirs) throws IOException {
+    public String save(MultipartFile imgFile, String... dirs) throws IOException {
         Path fullPath = imgDirectory;
 
         for (String dir : dirs) {
             fullPath.resolve(dir);
         }
 
+        fullPath.resolve(imgFile.getContentType());
+
         Files.createDirectories(fullPath.getParent());
-        Files.write(fullPath, content);
+        Files.write(fullPath, imgFile.getBytes());
 
         return fullPath.toAbsolutePath().toString();
     }

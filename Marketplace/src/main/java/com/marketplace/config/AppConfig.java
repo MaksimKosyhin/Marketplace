@@ -17,11 +17,14 @@ import com.marketplace.service.category.CategoryService;
 import com.marketplace.service.category.CategoryServiceImpl;
 import com.marketplace.service.product.ProductService;
 import com.marketplace.service.product.ProductServiceImpl;
+import com.marketplace.service.user.UserService;
+import com.marketplace.service.user.UserServiceImpl;
 import com.marketplace.util.CategoryMapper;
 import com.marketplace.util.ProductMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 public class AppConfig {
@@ -47,11 +50,6 @@ public class AppConfig {
     @Bean
     public ProductRepository productRepository(JdbcTemplate jdbcTemplate) {
         return new JdbcProductRepository(jdbcTemplate);
-    }
-
-    @Bean
-    public UserRepository userRepository(JdbcTemplate jdbcTemplate) {
-        return new JdbcUserRepository(jdbcTemplate);
     }
 
     @Bean

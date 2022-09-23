@@ -3,10 +3,12 @@ package com.marketplace.service.category;
 import com.marketplace.config.ImageLoader;
 import com.marketplace.config.exception.AddEntryException;
 import com.marketplace.config.exception.ModifyingEntryException;
+import com.marketplace.controller.category.CategoryShops;
 import com.marketplace.repository.category.*;
 import com.marketplace.config.exception.NonExistingEntityException;
 import com.marketplace.config.exception.ParentCategoryException;
 import com.marketplace.util.CategoryMapper;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.*;
@@ -33,6 +35,16 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    public boolean containsSubcategories(long categoryId) {
+        if(repository.isParentCategory(categoryId)) {
+            return repository.containsSubcategories(categoryId);
+        } else {
+            throw new ParentCategoryException(
+                    String.format("category with id: %s is not parent category"));
+        }
+    }
+
+    @Override
     public void addCategory(Category category) {
         if (!repository.categoryExists(category.getParentId())) {
             throw new NonExistingEntityException(
@@ -45,7 +57,7 @@ public class CategoryServiceImpl implements CategoryService {
 
         try {
             imgLocation = imageLoader.save(
-                    category.getImgData(),
+                    category.getImgFile(),
                     "category",
                     category.getName()
             );
@@ -60,7 +72,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<Category> getCategories(long parentId) throws Exception {
+    public List<Category> getCategories(long parentId) {
         if (!repository.isParentCategory(parentId)) {
             throw new ParentCategoryException(
                     "This category doesn't have subcategories"
@@ -89,23 +101,33 @@ public class CategoryServiceImpl implements CategoryService {
             throw new NonExistingEntityException(
                     String.format("Category with id: %d doesn't exist", categoryId)
             );
+        } else if (repository.containsSubcategories(categoryId)) {
+            throw new ParentCategoryException(
+                    "Cannot remove category which has child categories"
+            );
         } else if (!repository.removeCategory(categoryId)) {
             throw new ModifyingEntryException(
-                    String.format("Category with id: %d was not modified", categoryId)
-            );
+                    String.format("category with id: %d was not removed", categoryId));
         }
     }
 
     @Override
-    public void addShopToCategory(long shop_id, long category_id) {
-        if(!repository.addShopToCategory(shop_id, category_id)) {
-            throw new AddEntryException("shop cannot be added to category");
+    @Transactional
+    public void addShopsToCategory(CategoryShops shops) {
+        if (isParentCategory(shops.getCategoryId())) {
+            throw new AddEntryException("Cannot add shops to parent category");
+        }
+
+        for(Shop shop: shops.getShops()) {
+            if(!repository.addShopToCategory(shop.getShopId(), shops.getCategoryId())) {
+                throw new AddEntryException("shop was not added to category");
+            }
         }
     }
 
     @Override
-    public List<Shop> getShops(long categoryId) {
-        return repository.getShops(categoryId);
+    public List<Shop> getShops() {
+        return repository.getShops();
     }
 
     @Override
@@ -146,6 +168,16 @@ public class CategoryServiceImpl implements CategoryService {
             return combineCharacteristicValues(getGroupedByName(categoryId));
         } else {
             throw new NonExistingEntityException("Category does not exist");
+        }
+    }
+
+    @Override
+    public List<Long> getCharacteristicsId(long categoryId) {
+        if(repository.categoryExists(categoryId)) {
+            return repository.getCharacteristicsId(categoryId);
+        } else {
+            throw new NonExistingEntityException(
+                    String.format("category with id: %s does not exist"));
         }
     }
 

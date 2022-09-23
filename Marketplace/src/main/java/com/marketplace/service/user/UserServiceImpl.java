@@ -8,17 +8,19 @@ import com.marketplace.repository.user.UserRole;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public class UserDetailsServiceImpl implements UserDetailsService {
+public class UserServiceImpl implements UserService {
     private final UserRepository repository;
+    private final PasswordEncoder encoder;
 
-    public UserDetailsServiceImpl(UserRepository repository) {
+    public UserServiceImpl(UserRepository repository, PasswordEncoder encoder) {
         this.repository = repository;
+        this.encoder = encoder;
     }
 
     private Set<GrantedAuthority> getGrantedAuthorities(UserRole role) {
@@ -43,12 +45,15 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         );
     }
 
+    @Override
     public void addUser(DbUser user) {
 
         if (repository.userExists(user.getUsername())) {
             throw new AddEntryException(
-                    String.format("user with username: %s already exists"));
+                    String.format("user with username: %s already exists", user.getUsername()));
         } else {
+            user.setPassword(encoder.encode(user.getPassword()));
+
             if (repository.addUser(user) == -1) {
                 throw new AddEntryException("new user was not added");
             }

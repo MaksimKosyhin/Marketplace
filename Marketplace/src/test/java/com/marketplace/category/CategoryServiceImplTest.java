@@ -50,7 +50,7 @@ class CategoryServiceImplTest {
     @Test
     void addsCategory() throws IOException {
         //given
-        Category category = new Category(-1, "test", new byte[]{});
+        Category category = new Category();
 
         given(categoryRepository.categoryExists(category.getParentId()))
                 .willReturn(true);
@@ -59,7 +59,8 @@ class CategoryServiceImplTest {
                 0L,
                 category.getName(),
                 category.getParentId(),
-                "test"
+                "test",
+                true
         );
 
         given(categoryMapper.toDbCategory(category)).willReturn(dbCategory);
@@ -78,11 +79,11 @@ class CategoryServiceImplTest {
         String imgLocation = "test";
         FileSystemResource resource = new FileSystemResource(imgLocation);
 
-        DbCategory db1 = new DbCategory(2L, "test1", 1L, imgLocation);
-        DbCategory db2 = new DbCategory(3L, "test2", 1L, imgLocation);
+        DbCategory db1 = new DbCategory(2L, "test1", 1L, imgLocation, true);
+        DbCategory db2 = new DbCategory(3L, "test2", 1L, imgLocation, true);
 
-        Category c1 = new Category(db1.getCategoryId(), db1.getName(), resource);
-        Category c2 = new Category(db2.getCategoryId(), db2.getName(), resource);
+        Category c1 = new Category();
+        Category c2 = new Category();
 
         given(categoryRepository.isParentCategory(categoryId))
                 .willReturn(true);

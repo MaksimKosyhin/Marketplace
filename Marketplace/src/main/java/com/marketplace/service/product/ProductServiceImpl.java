@@ -67,7 +67,7 @@ public class ProductServiceImpl implements ProductService {
 
         String imgLocation;
         try {
-            imgLocation = imageLoader.save(productInfo.getImgData(), "product", productInfo.getName());
+            imgLocation = imageLoader.save(productInfo.getImgFile(), "product", productInfo.getName());
         } catch (IOException ex) {
             throw new ModifyingEntryException(ex.getMessage());
         }

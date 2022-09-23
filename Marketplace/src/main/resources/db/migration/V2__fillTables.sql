@@ -1,0 +1,1 @@
+INSERT INTO categories(name, img_location, parent_category) VALUES ('all', '', TRUE);

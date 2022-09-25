@@ -58,7 +58,6 @@ public class CategoryController {
 
     @GetMapping("/products")
     public String getProducts(@RequestParam ProductQuery query, Model model) {
-
         model.addAttribute("products", service.getProducts(query));
         model.addAttribute("characteristics", service.getCharacteristics(query.getCategoryId()));
 

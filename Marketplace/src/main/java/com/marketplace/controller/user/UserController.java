@@ -34,6 +34,5 @@ public class UserController {
     public void register(@ModelAttribute DbUser user, HttpServletRequest request) throws ServletException {
         service.addUser(user);
         request.login(user.getUsername(), user.getPassword());
-
     }
 }

@@ -68,7 +68,7 @@ public class JdbcCategoryRepository implements  CategoryRepository{
                 "category_id, " +
                 "name, " +
                 "img_location, " +
-                "parent_category" +
+                "parent_category " +
                 "FROM categories " +
                 "WHERE " +
                 "parent_id = ? AND " +

@@ -1,7 +1,6 @@
-package com.marketplace.service.category;
+package com.marketplace.controller.category;
 
 import lombok.*;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.web.multipart.MultipartFile;
 
 @NoArgsConstructor
@@ -9,15 +8,14 @@ import org.springframework.web.multipart.MultipartFile;
 @Setter
 @EqualsAndHashCode
 @ToString
-public class Category {
+public class CategoryInfo {
     private long parentId;
-    private long categoryId;
+    private String parentName;
     private String name;
-    private FileSystemResource imgResource;
     private MultipartFile imgFile;
     private boolean parentCategory;
 
-    public Category(long parentId) {
+    public CategoryInfo(long parentId, String parentName) {
         this.parentId = parentId;
         this.parentCategory = false;
     }

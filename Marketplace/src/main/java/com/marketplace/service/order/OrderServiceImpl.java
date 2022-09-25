@@ -1,30 +1,23 @@
 package com.marketplace.service.order;
 
-import com.marketplace.config.ImageLoader;
 import com.marketplace.config.exception.AddEntryException;
 import com.marketplace.config.exception.ModifyingEntryException;
-import com.marketplace.repository.order.DbOrderedProduct;
-import com.marketplace.repository.order.OrderQuery;
+import com.marketplace.config.exception.NonExistingEntityException;
 import com.marketplace.repository.order.OrderRepository;
-import com.marketplace.util.OrderMapper;
+import com.marketplace.repository.order.OrderedProduct;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
 
 public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository repository;
-    private final OrderMapper mapper;
-    private final ImageLoader imageLoader;
 
-    public OrderServiceImpl(OrderRepository repository, OrderMapper mapper, ImageLoader imageLoader) {
+    public OrderServiceImpl(OrderRepository repository) {
         this.repository = repository;
-        this.mapper = mapper;
-        this.imageLoader = imageLoader;
     }
 
     @Override
@@ -41,16 +34,17 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<OrderedProduct> getCurrentOrder(String username) {
         long orderId = repository.getCurrentOrderId(username);
-
-        return repository.getOrder(orderId)
-                .stream()
-                .map(this::toOrderedProduct)
-                .collect(Collectors.toList());
+        return repository.getOrder(orderId);
     }
 
     @Override
     public Map<LocalDate, List<OrderedProduct>> getAllOrders(String username) {
         long userId = repository.getUserId(username);
+
+        if(userId == -1) {
+            throw new NonExistingEntityException(
+                    String.format("user with username: %s doesn't exist", username));
+        }
 
         return repository.getAllOrders(userId)
                 .stream()
@@ -61,22 +55,11 @@ public class OrderServiceImpl implements OrderService {
                 );
     }
 
-    private void addOrderedProductToMap(Map<LocalDate, List<OrderedProduct>> map, DbOrderedProduct dbProduct) {
+    private void addOrderedProductToMap(Map<LocalDate, List<OrderedProduct>> map, OrderedProduct product) {
         map.computeIfAbsent(
-                        dbProduct.getRegistrationDate(),
+                        product.getRegistrationDate(),
                         list -> new ArrayList<OrderedProduct>())
-                .add(toOrderedProduct(dbProduct));
-    }
-
-    private OrderedProduct toOrderedProduct(DbOrderedProduct dbProduct) {
-        OrderedProduct product = mapper.toOrderedProduct(dbProduct);
-
-        product.setProductImgResource(
-                imageLoader.toFileSystemResource(dbProduct.getProductImgLocation()));
-        product.setShopImgResource(
-                imageLoader.toFileSystemResource(dbProduct.getShopImgLocation()));
-
-        return product;
+                .add(product);
     }
 
     @Override

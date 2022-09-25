@@ -8,9 +8,7 @@ import com.marketplace.repository.product.*;
 import com.marketplace.util.ProductMapper;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ProductServiceImpl implements ProductService {
 
@@ -31,31 +29,12 @@ public class ProductServiceImpl implements ProductService {
                     String.format("product with id: %d doesn't exist", productId));
         }
 
-        DbProduct product = repository.getProduct(productId);
+        Product product = repository.getProduct(productId);
 
-        ProductDescription description = mapper.toProductDescription(
-                product,
-                repository.getProductCharacteristics(productId)
-        );
+        ProductDescription description = mapper.toProductDescription(product);
 
-        description.setImgResource(
-                imageLoader.toFileSystemResource(product.getImgLocation()));
-
-        List<ShopProductDescription> shops = repository.getShopProducts(productId)
-                .stream()
-                .map(this::toShopProductDescription)
-                .collect(Collectors.toList());
-
-        description.setShops(shops);
-
-        return description;
-    }
-
-    private ShopProductDescription toShopProductDescription(ShopProduct shopProduct) {
-        ShopProductDescription description = mapper.toShopProductDescription(shopProduct);
-
-        description.setResource(
-                imageLoader.toFileSystemResource(shopProduct.getImgLocation()));
+        description.setCharacteristics(repository.getProductCharacteristics(productId));
+        description.setShops(repository.getShopProducts(productId));
 
         return description;
     }
@@ -63,17 +42,10 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     @Override
     public void addProduct(ProductInfo productInfo) {
-        DbProduct dbProduct = mapper.toDbProduct(productInfo);
+        Product product = mapper.toProduct(productInfo);
+        product.setImgLocation(imageLoader.save(productInfo.getImgFile(), "product", productInfo.getName()));
 
-        String imgLocation;
-        try {
-            imgLocation = imageLoader.save(productInfo.getImgFile(), "product", productInfo.getName());
-        } catch (IOException ex) {
-            throw new ModifyingEntryException(ex.getMessage());
-        }
-        dbProduct.setImgLocation(imgLocation);
-
-        long productId = repository.addProduct(dbProduct);
+        long productId = repository.addProduct(product);
         if (productId == -1) {
             throw new AddEntryException("product was not added");
         }
@@ -92,13 +64,13 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void addShopProduct(ShopProduct shopProduct) {
-        if (!repository.addShopProduct(shopProduct)) {
+    public void addShopProduct(ShopProductInfo info) {
+        if (!repository.addShopProduct(info)) {
             throw new ModifyingEntryException(
                     String.format(
                             "product with id: %d wasn't added to shop with id: %d",
-                            shopProduct.getProductId(),
-                            shopProduct.getShopId())
+                            info.getProductId(),
+                            info.getShopId())
             );
         }
     }

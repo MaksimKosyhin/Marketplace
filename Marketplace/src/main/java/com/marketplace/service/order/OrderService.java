@@ -1,10 +1,8 @@
 package com.marketplace.service.order;
 
-import com.marketplace.repository.category.ProductQuery;
-import com.marketplace.repository.order.OrderQuery;
+import com.marketplace.repository.order.OrderedProduct;
 
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 

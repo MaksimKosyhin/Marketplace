@@ -1,5 +1,7 @@
 package com.marketplace.repository.product;
 
+import com.marketplace.service.product.Shop;
+import com.marketplace.service.product.ShopProductInfo;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,7 +44,7 @@ public class JdbcProductRepository implements  ProductRepository{
     }
 
     @Override
-    public DbProduct getProduct(long productId) {
+    public Product getProduct(long productId) {
         String sql = "SELECT " +
                 "product_id, " +
                 "name, " +
@@ -52,7 +54,7 @@ public class JdbcProductRepository implements  ProductRepository{
 
         return jdbcTemplate.queryForObject(
                 sql,
-                new BeanPropertyRowMapper<DbProduct>(DbProduct.class),
+                new BeanPropertyRowMapper<Product>(Product.class),
                 productId
         );
     }
@@ -99,7 +101,7 @@ public class JdbcProductRepository implements  ProductRepository{
     }
 
     @Override
-    public long addProduct(DbProduct dbProduct) {
+    public long addProduct(Product product) {
         String sql = "INSERT INTO products(" +
                 "category_id, " +
                 "name, " +
@@ -111,9 +113,9 @@ public class JdbcProductRepository implements  ProductRepository{
             return jdbcTemplate.queryForObject(
                     sql,
                     Long.class,
-                    dbProduct.getCategoryId(),
-                    dbProduct.getName(),
-                    dbProduct.getImgLocation()
+                    product.getCategoryId(),
+                    product.getName(),
+                    product.getImgLocation()
             );
         } catch (Exception ex) {
             return -1;
@@ -121,7 +123,7 @@ public class JdbcProductRepository implements  ProductRepository{
     }
 
     @Override
-    public boolean addShopProduct(ShopProduct shopProduct) {
+    public boolean addShopProduct(ShopProductInfo info) {
         String sql = "INSERT INTO shop_products(" +
                 "shop_id, " +
                 "product_id, " +
@@ -133,12 +135,12 @@ public class JdbcProductRepository implements  ProductRepository{
 
         int updated = jdbcTemplate.update(
                 sql,
-                shopProduct.getShopId(),
-                shopProduct.getProductId(),
-                shopProduct.getLink(),
-                shopProduct.getScore(),
-                shopProduct.getPrice(),
-                shopProduct.getReviews()
+                info.getShopId(),
+                info.getProductId(),
+                info.getLink(),
+                info.getScore(),
+                info.getPrice(),
+                info.getReviews()
         );
 
         return updated == 1;
@@ -148,7 +150,7 @@ public class JdbcProductRepository implements  ProductRepository{
     public long addShop(Shop shop) {
         String sql = "INSERT INTO shops(" +
                 "name, " +
-                "link, " +
+                "img_location, " +
                 ") " +
                 "VALUES(?,?) " +
                 "RETURNING shop_id";

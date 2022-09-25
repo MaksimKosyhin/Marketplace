@@ -1,6 +1,5 @@
 package com.marketplace.service.product;
 
-import com.marketplace.repository.product.Shop;
 import com.marketplace.repository.product.ShopProduct;
 
 import java.io.IOException;
@@ -12,7 +11,7 @@ public interface ProductService {
 
     public void removeProduct(long productId);
 
-    public void addShopProduct(ShopProduct shopProduct);
+    public void addShopProduct(ShopProductInfo info);
 
     public void removeShopProduct(long productId, long shopId);
 

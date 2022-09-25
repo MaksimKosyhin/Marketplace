@@ -1,7 +1,8 @@
-package com.marketplace.service.order;
+package com.marketplace.repository.order;
 
 import lombok.*;
-import org.springframework.core.io.FileSystemResource;
+
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -13,10 +14,11 @@ public class OrderedProduct {
     private long orderId;
     private long shopId;
     private long productId;
+    private LocalDate registrationDate;
     private String productName;
-    private FileSystemResource productImgResource;
+    private String productImgLocation;
     private int amount;
     private int price;
     private String shopName;
-    private FileSystemResource shopImgResource;
+    private String shopImgLocation;
 }

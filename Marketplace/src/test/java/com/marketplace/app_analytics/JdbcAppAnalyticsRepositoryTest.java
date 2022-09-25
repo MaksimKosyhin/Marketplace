@@ -2,6 +2,8 @@ package com.marketplace.app_analytics;
 
 import com.marketplace.repository.app_analytics.AppAnalyticsRepository;
 import com.marketplace.repository.app_analytics.ProductIncomeQuery;
+import org.flywaydb.core.Flyway;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -14,19 +16,23 @@ import org.testcontainers.containers.PostgreSQLContainer;
 
 import java.time.LocalDate;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 @SpringBootTest
 public class JdbcAppAnalyticsRepositoryTest {
     private final JdbcTemplate template;
     private final AppAnalyticsRepository repository;
+    private final Flyway flyway;
 
     private static PostgreSQLContainer container =
             (PostgreSQLContainer) new PostgreSQLContainer("postgres")
                     .withReuse(true);
 
     @Autowired
-    JdbcAppAnalyticsRepositoryTest(JdbcTemplate template, AppAnalyticsRepository repository) {
+    JdbcAppAnalyticsRepositoryTest(JdbcTemplate template, AppAnalyticsRepository repository, Flyway flyway) {
         this.template = template;
         this.repository = repository;
+        this.flyway = flyway;
     }
 
     @DynamicPropertySource
@@ -41,9 +47,15 @@ public class JdbcAppAnalyticsRepositoryTest {
         container.start();
     }
 
+    @AfterAll
+    public static void close() {
+        container.stop();
+    }
+
     @AfterEach
     void tearDown() {
-        template.update("TRUNCATE TABLE categories, users, shops CASCADE");
+        flyway.clean();
+        flyway.migrate();
     }
 
     @Test
@@ -54,5 +66,7 @@ public class JdbcAppAnalyticsRepositoryTest {
         repository.getProductsIncomeForAllShops(new ProductIncomeQuery());
         repository.getProductsIncomeForShop(new ProductIncomeQuery());
         repository.getShops(1);
+
+//        assertThat(template.queryForObject("SELECT COUNT(*) FROM categories", Long.class)).isEqualTo(0);
     }
 }

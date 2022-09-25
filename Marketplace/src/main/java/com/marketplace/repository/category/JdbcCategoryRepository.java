@@ -1,6 +1,6 @@
 package com.marketplace.repository.category;
 
-import com.marketplace.service.category.SortingOption;
+import com.marketplace.service.category.*;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
@@ -62,12 +62,13 @@ public class JdbcCategoryRepository implements  CategoryRepository{
     }
 
     @Override
-    public List<DbCategory> getCategories(long parentId) {
+    public List<Category> getCategories(long parentId) {
         String sql = "SELECT " +
                 "parent_id, " +
                 "category_id, " +
                 "name, " +
-                "img_location " +
+                "img_location, " +
+                "parent_category" +
                 "FROM categories " +
                 "WHERE " +
                 "parent_id = ? AND " +
@@ -75,13 +76,13 @@ public class JdbcCategoryRepository implements  CategoryRepository{
 
         return template.query(
                 sql,
-                new BeanPropertyRowMapper<DbCategory>(DbCategory.class),
+                new BeanPropertyRowMapper<Category>(Category.class),
                 parentId
         );
     }
 
     @Override
-    public List<DbProductInfo> getProducts(ProductQuery productQuery) {
+    public List<ProductInfo> getProducts(ProductQuery productQuery) {
         String sql = "SELECT " +
                     "products.product_id AS product_id, " +
                     "products.name AS name, " +
@@ -111,7 +112,7 @@ public class JdbcCategoryRepository implements  CategoryRepository{
 
         return template.query(
                 sql,
-                new BeanPropertyRowMapper<DbProductInfo>(DbProductInfo.class),
+                new BeanPropertyRowMapper<ProductInfo>(ProductInfo.class),
                 getQueryParameters(productQuery)
         );
     }
@@ -144,21 +145,23 @@ public class JdbcCategoryRepository implements  CategoryRepository{
     }
 
     @Override
-    public long addCategory(DbCategory dbCategory) {
+    public long addCategory(Category category) {
         String sql = "INSERT INTO categories(" +
                 "name, " +
                 "parent_id, " +
-                "img_location) " +
-                "VALUES (?, ?, ?) " +
+                "img_location, " +
+                "parent_category) " +
+                "VALUES (?, ?, ?, ?) " +
                 "RETURNING category_id";
 
         try {
             return template.queryForObject(
                     sql,
                     Long.class,
-                    dbCategory.getName(),
-                    dbCategory.getParentId(),
-                    dbCategory.getImgLocation()
+                    category.getName(),
+                    category.getParentId(),
+                    category.getImgLocation(),
+                    category.isParentCategory()
             );
         } catch (Exception ex) {
             return -1;
@@ -183,7 +186,7 @@ public class JdbcCategoryRepository implements  CategoryRepository{
     }
 
     @Override
-    public long addCharacteristic(DbCharacteristic dbCharacteristic) {
+    public long addCharacteristic(Characteristic characteristic) {
         String sql = "INSERT INTO characteristics(" +
                 "category_id, " +
                 "name, " +
@@ -195,9 +198,9 @@ public class JdbcCategoryRepository implements  CategoryRepository{
             return template.queryForObject(
                     sql,
                     Long.class,
-                    dbCharacteristic.getCategoryId(),
-                    dbCharacteristic.getName(),
-                    dbCharacteristic.getCharacteristicValue()
+                    characteristic.getCategoryId(),
+                    characteristic.getName(),
+                    characteristic.getCharacteristicValue()
             );
         } catch (Exception ex) {
             return -1;
@@ -205,7 +208,7 @@ public class JdbcCategoryRepository implements  CategoryRepository{
     }
 
     @Override
-    public List<DbCharacteristic> getCharacteristics(long categoryId) {
+    public List<Characteristic> getCharacteristics(long categoryId) {
         String sql = "SELECT " +
                     "characteristic_id, " +
                     "category_id, " +
@@ -215,7 +218,7 @@ public class JdbcCategoryRepository implements  CategoryRepository{
                 "WHERE category_id = ?";
 
         return template.query(sql,
-                new BeanPropertyRowMapper<DbCharacteristic>(DbCharacteristic.class),
+                new BeanPropertyRowMapper<Characteristic>(Characteristic.class),
                 categoryId);
     }
 

@@ -1,9 +1,8 @@
-TRUNCATE TABLE users, categories, shops;
 
-INSERT INTO categories(name, img_location) VALUES ('electronics', 'path1');
-INSERT INTO categories(parent_id, name, img_location) VALUES (1, 'laptops', 'path2');
-INSERT INTO categories(parent_id, name, img_location) VALUES (1, 'tablets', 'path3');
-INSERT INTO categories(parent_id, name, img_location, removed) VALUES (1, 'phones', 'path4', TRUE);
+INSERT INTO categories(name, img_location, parent_category) VALUES ('electronics', 'path1', TRUE);
+INSERT INTO categories(parent_id, name, img_location, parent_category) VALUES (1, 'laptops', 'path2', FALSE);
+INSERT INTO categories(parent_id, name, img_location, parent_category) VALUES (1, 'tablets', 'path3', FALSE);
+INSERT INTO categories(parent_id, name, img_location, parent_category, removed) VALUES (1, 'phones', 'path4', FALSE, TRUE);
 
 INSERT INTO products(name, category_id, img_location) VALUES ('laptopA', 2, 'path5');
 INSERT INTO products(name, category_id, img_location) VALUES ('laptopB', 2, 'path6');

@@ -1,7 +1,6 @@
-package com.marketplace.service.app_analytics;
+package com.marketplace.repository.app_analytics;
 
 import lombok.*;
-import org.springframework.core.io.FileSystemResource;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -12,7 +11,7 @@ import org.springframework.core.io.FileSystemResource;
 public class ProductIncome {
     private long productId;
     private String name;
-    private FileSystemResource imgResource;
+    private String imgLocation;
     private int numberOfOrders;
     private int income;
     private boolean removed;

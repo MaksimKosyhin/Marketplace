@@ -1,8 +1,9 @@
 package com.marketplace.service.product;
 
 import com.marketplace.repository.product.ProductCharacteristic;
+import com.marketplace.repository.product.ShopProduct;
 import lombok.*;
-import org.springframework.core.io.FileSystemResource;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -15,9 +16,8 @@ public class ProductDescription {
     private long productId;
     private long categoryId;
     private String name;
-    private byte[] imgData;
-    private FileSystemResource imgResource;
+    private String imgLocation;
 
     private List<ProductCharacteristic> characteristics;
-    private List<ShopProductDescription> shops;
+    private List<ShopProduct> shops;
 }

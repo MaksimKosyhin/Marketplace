@@ -1,4 +1,4 @@
-package com.marketplace.repository.category;
+package com.marketplace.service.category;
 
 import com.marketplace.service.category.SortingOption;
 import lombok.*;

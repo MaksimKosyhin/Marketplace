@@ -3,14 +3,15 @@ package com.marketplace.service.category;
 import com.marketplace.config.ImageLoader;
 import com.marketplace.config.exception.AddEntryException;
 import com.marketplace.config.exception.ModifyingEntryException;
+import com.marketplace.controller.category.CategoryInfo;
 import com.marketplace.controller.category.CategoryShops;
+import com.marketplace.repository.category.ProductInfo;
 import com.marketplace.repository.category.*;
 import com.marketplace.config.exception.NonExistingEntityException;
 import com.marketplace.config.exception.ParentCategoryException;
 import com.marketplace.util.CategoryMapper;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -40,33 +41,28 @@ public class CategoryServiceImpl implements CategoryService {
             return repository.containsSubcategories(categoryId);
         } else {
             throw new ParentCategoryException(
-                    String.format("category with id: %s is not parent category"));
+                    String.format("category with id: %d is not parent category", categoryId));
         }
     }
 
     @Override
-    public void addCategory(Category category) {
-        if (!repository.categoryExists(category.getParentId())) {
+    public void addCategory(CategoryInfo info) {
+        if (!repository.categoryExists(info.getParentId())) {
             throw new NonExistingEntityException(
                     "parent category for this category does not exist");
         }
 
-        DbCategory dbCategory = mapper.toDbCategory(category);
+        Category category = mapper.toCategory(info);
 
-        String imgLocation;
+        String imgLocation = imageLoader.save(
+                info.getImgFile(),
+                "category",
+                info.getParentName()
+        );
 
-        try {
-            imgLocation = imageLoader.save(
-                    category.getImgFile(),
-                    "category",
-                    category.getName()
-            );
-        } catch (IOException ex) {
-            throw new AddEntryException(ex.getMessage());
-        }
-        dbCategory.setImgLocation(imgLocation);
+        category.setImgLocation(imgLocation);
 
-        if (repository.addCategory(dbCategory) == -1) {
+        if (repository.addCategory(category) == -1) {
             throw new AddEntryException("category was not added");
         }
     }
@@ -79,20 +75,7 @@ public class CategoryServiceImpl implements CategoryService {
             );
         }
 
-        return repository.getCategories(parentId)
-                .stream()
-                .map(this::toCategory)
-                .collect(Collectors.toList());
-    }
-
-    private Category toCategory(DbCategory dbCategory) {
-        Category category = mapper.toCategory(dbCategory);
-
-        category.setImgResource(
-                imageLoader.toFileSystemResource(
-                        dbCategory.getImgLocation()));
-
-        return category;
+        return repository.getCategories(parentId);
     }
 
     @Override
@@ -137,23 +120,14 @@ public class CategoryServiceImpl implements CategoryService {
         } else if (!repository.categoryExists(productQuery.getCategoryId())) {
             throw new NonExistingEntityException("Category does not exist");
         } else {
-            return repository.getProducts(productQuery)
-                    .stream()
-                    .map(this::toProductInfo)
-                    .collect(Collectors.toList());
+            return repository.getProducts(productQuery);
         }
     }
 
-    private ProductInfo toProductInfo(DbProductInfo dbInfo) {
-        ProductInfo info = mapper.toProductInfo(dbInfo);
-        info.setImgResource(imageLoader.toFileSystemResource(dbInfo.getImgLocation()));
-        return info;
-    }
-
     @Override
-    public void addCharacteristic(DbCharacteristic dbCharacteristic) {
-        if (repository.categoryExists(dbCharacteristic.getCategoryId())) {
-            if (repository.addCharacteristic(dbCharacteristic) == -1) {
+    public void addCharacteristic(Characteristic characteristic) {
+        if (repository.categoryExists(characteristic.getCategoryId())) {
+            if (repository.addCharacteristic(characteristic) == -1) {
                 throw new ModifyingEntryException("Characteristic was not added");
             }
         } else {
@@ -163,7 +137,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<Characteristic> getCharacteristics(long categoryId) {
+    public List<CharacteristicMap> getCharacteristics(long categoryId) {
         if (repository.categoryExists(categoryId)) {
             return combineCharacteristicValues(getGroupedByName(categoryId));
         } else {
@@ -177,21 +151,21 @@ public class CategoryServiceImpl implements CategoryService {
             return repository.getCharacteristicsId(categoryId);
         } else {
             throw new NonExistingEntityException(
-                    String.format("category with id: %s does not exist"));
+                    String.format("category with id: %s does not exist", categoryId));
         }
     }
 
-    private List<Characteristic> combineCharacteristicValues(Map<String, Set<DbCharacteristic>> map) {
+    private List<CharacteristicMap> combineCharacteristicValues(Map<String, Set<Characteristic>> map) {
         return map.entrySet()
                 .stream()
                 .map(this::combineCharacteristicValues)
                 .collect(Collectors.toList());
     }
 
-    private Characteristic combineCharacteristicValues(Map.Entry<String, Set<DbCharacteristic>> entry) {
-        Characteristic result = new Characteristic(entry.getKey());
+    private CharacteristicMap combineCharacteristicValues(Map.Entry<String, Set<Characteristic>> entry) {
+        CharacteristicMap result = new CharacteristicMap(entry.getKey());
 
-        for (DbCharacteristic c : entry.getValue()) {
+        for (Characteristic c : entry.getValue()) {
             result.getValues().put(
                     c.getCharacteristicId(),
                     c.getCharacteristicValue()
@@ -201,12 +175,12 @@ public class CategoryServiceImpl implements CategoryService {
         return result;
     }
 
-    private Map<String, Set<DbCharacteristic>> getGroupedByName(long categoryId) {
+    private Map<String, Set<Characteristic>> getGroupedByName(long categoryId) {
         return repository.getCharacteristics(categoryId)
                 .stream()
                 .collect(
                         Collectors.groupingBy(
-                                DbCharacteristic::getName,
+                                Characteristic::getName,
                                 Collectors.toSet()
                         )
                 );

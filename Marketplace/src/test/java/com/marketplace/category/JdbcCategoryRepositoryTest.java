@@ -1,6 +1,10 @@
 package com.marketplace.category;
 
 import com.marketplace.repository.category.*;
+import com.marketplace.repository.category.Category;
+import com.marketplace.repository.category.Characteristic;
+import com.marketplace.repository.category.ProductInfo;
+import com.marketplace.service.category.ProductQuery;
 import com.marketplace.service.category.SortingOption;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.AfterAll;
@@ -73,8 +77,8 @@ public class JdbcCategoryRepositoryTest {
     public void returnsCategories() {
         assertThat(repository.getCategories(1)).isEqualTo(
                 List.of(
-                        new DbCategory(2L, "laptops", 1L, "path2"),
-                        new DbCategory(3L, "tablets", 1L, "path3")
+                        new Category(2L, "laptops", 1L, "path2", false),
+                        new Category(3L, "tablets", 1L, "path3", false)
                 )
         );
     }
@@ -83,8 +87,8 @@ public class JdbcCategoryRepositoryTest {
     public void returnsCharacteristics() {
         assertThat(repository.getCharacteristics(2)).isEqualTo(
                 List.of(
-                        new DbCharacteristic(1L, 2L, "color", "red"),
-                        new DbCharacteristic(2L, 2L, "color", "black")
+                        new Characteristic(1L, 2L, "color", "red"),
+                        new Characteristic(2L, 2L, "color", "black")
                 )
         );
     }
@@ -122,7 +126,7 @@ public class JdbcCategoryRepositoryTest {
     @Test
     public void returnsProducts() {
         //given
-        DbProductInfo info1 = new DbProductInfo(
+        ProductInfo info1 = new ProductInfo(
                 1,
                 "laptopA",
                 "path5",
@@ -131,7 +135,7 @@ public class JdbcCategoryRepositoryTest {
                 67
         );
 
-        DbProductInfo info2 = new DbProductInfo(
+        ProductInfo info2 = new ProductInfo(
                 2,
                 "laptopB",
                 "path6",

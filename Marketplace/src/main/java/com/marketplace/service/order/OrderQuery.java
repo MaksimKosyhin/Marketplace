@@ -1,4 +1,4 @@
-package com.marketplace.repository.order;
+package com.marketplace.service.order;
 
 import lombok.*;
 

@@ -1,7 +1,7 @@
 package com.marketplace.product;
 
 import com.marketplace.config.ImageLoader;
-import com.marketplace.repository.product.DbProduct;
+import com.marketplace.repository.product.Product;
 import com.marketplace.repository.product.ProductRepository;
 import com.marketplace.service.product.ProductInfo;
 import com.marketplace.service.product.ProductServiceImpl;
@@ -13,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.mock.web.MockMultipartFile;
 
 import java.util.List;
 
@@ -49,7 +50,6 @@ public class ProductServiceImplTest {
 
         //then
         verify(mapper).toProductDescription(
-                any(),
                 any()
         );
 
@@ -64,13 +64,12 @@ public class ProductServiceImplTest {
         ProductInfo productinfo = new ProductInfo(
                 1,
                 "test",
-                new byte[]{},
-                new FileSystemResource(""),
+                new MockMultipartFile("test", new byte[] {}),
                 List.of(1L, 2L, 3L)
         );
 
         given(repository.addProduct(any())).willReturn(1L);
-        given(mapper.toDbProduct(any(ProductInfo.class))).willReturn(new DbProduct());
+        given(mapper.toProduct(any(ProductInfo.class))).willReturn(new Product());
 
         //when
         service.addProduct(productinfo);

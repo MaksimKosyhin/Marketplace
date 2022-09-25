@@ -1,5 +1,7 @@
 package com.marketplace.repository.category;
 
+import com.marketplace.service.category.ProductQuery;
+
 import java.util.List;
 
 public interface CategoryRepository {
@@ -9,20 +11,20 @@ public interface CategoryRepository {
 
     public boolean containsSubcategories(long categoryId);
 
-    public List<DbCategory> getCategories(long parentId);
+    public List<Category> getCategories(long parentId);
 
-    public List<DbProductInfo> getProducts(ProductQuery productQuery);
+    public List<ProductInfo> getProducts(ProductQuery productQuery);
 
     public boolean removeCategory(long categoryId);
 
-    public long addCategory(DbCategory dbCategory);
+    public long addCategory(Category category);
 
     public boolean addShopToCategory(long shopId, long categoryId);
 
     public List<Shop> getShops();
 
-    public long addCharacteristic(DbCharacteristic dbCharacteristic);
+    public long addCharacteristic(Characteristic characteristic);
 
-    public List<DbCharacteristic> getCharacteristics(long categoryId);
+    public List<Characteristic> getCharacteristics(long categoryId);
     public List<Long> getCharacteristicsId(long categoryId);
 }

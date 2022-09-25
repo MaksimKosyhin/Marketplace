@@ -1,4 +1,4 @@
-package com.marketplace.repository.product;
+package com.marketplace.service.product;
 
 import lombok.*;
 

@@ -1,6 +1,6 @@
 package com.marketplace.product;
 
-import com.marketplace.repository.product.DbProduct;
+import com.marketplace.repository.product.Product;
 import com.marketplace.repository.product.ProductCharacteristic;
 import com.marketplace.repository.product.ProductRepository;
 import com.marketplace.repository.product.ShopProduct;
@@ -70,7 +70,7 @@ class JdbcProductRepositoryTest {
    @Test
    public void returnsProduct() {
         assertThat(repository.getProduct(1)).isEqualTo(
-                new DbProduct(1,0,"laptopA", "path5")
+                new Product(1,0,"laptopA", "path5")
         );
    }
 

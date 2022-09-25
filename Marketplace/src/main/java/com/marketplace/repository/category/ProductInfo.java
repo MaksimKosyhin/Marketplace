@@ -1,4 +1,4 @@
-package com.marketplace.repository.app_analytics;
+package com.marketplace.repository.category;
 
 import lombok.*;
 
@@ -8,11 +8,11 @@ import lombok.*;
 @Setter
 @EqualsAndHashCode
 @ToString
-public class DbProductIncome {
+public class ProductInfo {
     private long productId;
     private String name;
     private String imgLocation;
-    private int numberOfOrders;
-    private int income;
-    private boolean removed;
+    private int minPrice;
+    private int maxPrice;
+    private int totalReviews;
 }

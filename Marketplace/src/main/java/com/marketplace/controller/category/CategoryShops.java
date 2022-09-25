@@ -12,6 +12,5 @@ import java.util.List;
 @ToString
 public class CategoryShops {
     private long categoryId;
-
     private List<Shop> shops;
 }

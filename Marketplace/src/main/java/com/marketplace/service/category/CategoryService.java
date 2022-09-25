@@ -1,18 +1,16 @@
 package com.marketplace.service.category;
 
+import com.marketplace.controller.category.CategoryInfo;
 import com.marketplace.controller.category.CategoryShops;
-import com.marketplace.repository.category.DbCharacteristic;
-import com.marketplace.repository.category.ProductQuery;
-import com.marketplace.repository.category.Shop;
+import com.marketplace.repository.category.*;
 
-import java.io.IOException;
 import java.util.List;
 
 public interface CategoryService {
     public boolean isParentCategory(long categoryId);
     public boolean containsSubcategories(long categoryId);
 
-    public void addCategory(Category category);
+    public void addCategory(CategoryInfo categoryInfo);
 
     public List<Category> getCategories(long parentId);
 
@@ -24,8 +22,8 @@ public interface CategoryService {
 
     public List<ProductInfo> getProducts(ProductQuery productQuery);
 
-    public void addCharacteristic(DbCharacteristic dbCharacteristic);
+    public void addCharacteristic(Characteristic characteristic);
 
-    public List<Characteristic> getCharacteristics(long categoryId);
+    public List<CharacteristicMap> getCharacteristics(long categoryId);
     public List<Long> getCharacteristicsId(long categoryId);
 }

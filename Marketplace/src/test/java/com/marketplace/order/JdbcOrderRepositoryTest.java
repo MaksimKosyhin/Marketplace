@@ -1,6 +1,6 @@
 package com.marketplace.order;
 
-import com.marketplace.repository.order.DbOrderedProduct;
+import com.marketplace.repository.order.OrderedProduct;
 import com.marketplace.repository.order.OrderRepository;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.AfterAll;
@@ -82,7 +82,7 @@ public class JdbcOrderRepositoryTest {
     public void returnProductsOfOrder() {
         assertThat(repository.getOrder( 1)).isEqualTo(
                 List.of(
-                        new DbOrderedProduct(
+                        new OrderedProduct(
                                 1,
                                 1,
                                 1,
@@ -93,7 +93,7 @@ public class JdbcOrderRepositoryTest {
                                 12,
                                 "shopA",
                                 "path8"),
-                        new DbOrderedProduct(
+                        new OrderedProduct(
                                 1,
                                 1,
                                 2,
@@ -104,7 +104,7 @@ public class JdbcOrderRepositoryTest {
                                 12,
                                 "shopA",
                                 "path8"),
-                        new DbOrderedProduct(
+                        new OrderedProduct(
                                 1,
                                 2,
                                 3,

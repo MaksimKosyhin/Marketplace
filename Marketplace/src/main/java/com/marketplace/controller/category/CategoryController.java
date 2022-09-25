@@ -1,14 +1,11 @@
 package com.marketplace.controller.category;
 
-import com.marketplace.repository.category.ProductQuery;
-import com.marketplace.service.category.Category;
+import com.marketplace.service.category.ProductQuery;
 import com.marketplace.service.category.CategoryService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import java.security.Principal;
 
 @Controller
 @RequestMapping("categories")
@@ -22,14 +19,14 @@ public class CategoryController {
 
     @GetMapping("{parentId}/new")
     public String addCategory(@PathVariable long parentId, Model model) {
-        model.addAttribute("category", new Category(parentId));
+//        model.addAttribute("category", new CategoryInfo(parentId));
         return "new-category";
     }
 
     @PostMapping
-    public String addCategory(@ModelAttribute Category category) {
-        service.addCategory(category);
-        return "redirect:/categories" + category.getParentId();
+    public String addCategory(@ModelAttribute CategoryInfo categoryInfo) {
+        service.addCategory(categoryInfo);
+        return "redirect:/categories" + categoryInfo.getParentId();
     }
 
     @PutMapping("{categoryId}")

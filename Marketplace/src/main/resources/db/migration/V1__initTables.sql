@@ -80,10 +80,10 @@ CREATE TYPE user_role AS ENUM('ADMIN', 'MODERATOR', 'USER');
 
 CREATE TABLE users
   (
-     user_id  INT GENERATED always AS IDENTITY,
-     username VARCHAR(90) UNIQUE NOT NULL,
-     password TEXT NOT NULL,
-     role user_role,
+     user_id           INT GENERATED always AS IDENTITY,
+     username          VARCHAR(90) UNIQUE NOT NULL,
+     password TEXT     NOT NULL,
+     role              user_role,
      registration_date DATE NOT NULL DEFAULT CURRENT_DATE,
      PRIMARY KEY(user_id)
   );

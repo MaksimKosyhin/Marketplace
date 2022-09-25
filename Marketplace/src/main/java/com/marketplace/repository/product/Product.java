@@ -8,13 +8,13 @@ import lombok.*;
 @Setter
 @EqualsAndHashCode
 @ToString
-public class DbProduct {
+public class Product {
     private long productId;
     private long categoryId;
     private String name;
     private String imgLocation;
 
-    public DbProduct(long categoryId, String name, String imgLocation) {
+    public Product(long categoryId, String name, String imgLocation) {
         this.categoryId = categoryId;
         this.name = name;
         this.imgLocation = imgLocation;

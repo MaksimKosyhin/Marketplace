@@ -8,10 +8,31 @@ import java.util.List;
 
 public class JdbcAppAnalyticsRepository implements  AppAnalyticsRepository{
 
-    private final JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate template;
 
-    public JdbcAppAnalyticsRepository(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
+    public JdbcAppAnalyticsRepository(JdbcTemplate template) {
+        this.template = template;
+    }
+
+    @Override
+    public boolean categoryExists(long categoryId) {
+        String sql = "SELECT EXISTS(" +
+                "SELECT 1 " +
+                "FROM categories " +
+                "WHERE " +
+                "category_id = ? " +
+                "LIMIT 1)";
+
+        return template.queryForObject(sql, Boolean.class, categoryId);
+    }
+
+    @Override
+    public boolean isParentCategory(long categoryId) {
+        String sql = "SELECT parent_category " +
+                "FROM categories " +
+                "WHERE category_id = ?";
+
+        return template.queryForObject(sql, Boolean.class, categoryId);
     }
 
     @Override
@@ -26,13 +47,13 @@ public class JdbcAppAnalyticsRepository implements  AppAnalyticsRepository{
                 "registration_date > ? AND " +
                 "registration_date < ?";
 
-        Integer sum = jdbcTemplate.queryForObject(sql, Integer.class, from, to);
+        Integer sum = template.queryForObject(sql, Integer.class, from, to);
 
         return sum == null ? 0 : sum;
     }
 
     @Override
-    public List<DbCategoryIncome> getCategoriesIncome(LocalDate from, LocalDate to) {
+    public List<CategoryIncome> getCategoriesIncome(LocalDate from, LocalDate to) {
         String sql = "SELECT " +
                 "categories.category_id AS category_id, " +
                 "categories.name AS name, " +
@@ -53,16 +74,16 @@ public class JdbcAppAnalyticsRepository implements  AppAnalyticsRepository{
                     "registration_date < ?  " +
                 "GROUP BY category_id";
 
-        return jdbcTemplate.query(
+        return template.query(
                 sql,
-                new BeanPropertyRowMapper<DbCategoryIncome>(DbCategoryIncome.class),
+                new BeanPropertyRowMapper<CategoryIncome>(CategoryIncome.class),
                 from,
                 to
         );
     }
 
     @Override
-    public List<DbProductIncome> getProductsIncomeForAllShops(ProductIncomeQuery query) {
+    public List<ProductIncome> getProductsIncomeForAllShops(ProductIncomeQuery query) {
         String sql = "SELECT " +
                 "product_id, " +
                 "name, " +
@@ -83,9 +104,9 @@ public class JdbcAppAnalyticsRepository implements  AppAnalyticsRepository{
                 "registration_date < ? " +
                 "GROUP BY product_id";
 
-        return jdbcTemplate.query(
+        return template.query(
                 sql,
-                new BeanPropertyRowMapper<DbProductIncome>(DbProductIncome.class),
+                new BeanPropertyRowMapper<ProductIncome>(ProductIncome.class),
                 query.getCategoryId(),
                 query.getFrom(),
                 query.getTo()
@@ -93,7 +114,7 @@ public class JdbcAppAnalyticsRepository implements  AppAnalyticsRepository{
     }
 
     @Override
-    public List<DbProductIncome> getProductsIncomeForShop(ProductIncomeQuery query) {
+    public List<ProductIncome> getProductsIncomeForShop(ProductIncomeQuery query) {
         String sql = "SELECT " +
                 "product_id, " +
                 "name, " +
@@ -115,9 +136,9 @@ public class JdbcAppAnalyticsRepository implements  AppAnalyticsRepository{
                 "shop_products.shop_id = ? " +
                 "GROUP BY product_id";
 
-        return jdbcTemplate.query(
+        return template.query(
                 sql,
-                new BeanPropertyRowMapper<DbProductIncome>(DbProductIncome.class),
+                new BeanPropertyRowMapper<ProductIncome>(ProductIncome.class),
                 query.getCategoryId(),
                 query.getFrom(),
                 query.getTo(),
@@ -133,7 +154,7 @@ public class JdbcAppAnalyticsRepository implements  AppAnalyticsRepository{
                 "USING(shop_id) " +
                 "WHERE category_id = ?";
 
-        return jdbcTemplate.query(
+        return template.query(
                 sql,
                 new BeanPropertyRowMapper<Shop>(Shop.class),
                 categoryId
@@ -148,6 +169,6 @@ public class JdbcAppAnalyticsRepository implements  AppAnalyticsRepository{
                     "registration_date > ? AND " +
                     "registration_date < ?";
 
-        return jdbcTemplate.queryForObject(sql, Integer.class, from, to);
+        return template.queryForObject(sql, Integer.class, from, to);
     }
 }

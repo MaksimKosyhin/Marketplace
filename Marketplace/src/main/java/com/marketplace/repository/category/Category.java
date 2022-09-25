@@ -8,11 +8,10 @@ import lombok.*;
 @Setter
 @EqualsAndHashCode
 @ToString
-public class DbProductInfo {
-    private long productId;
+public class Category {
+    private Long categoryId;
     private String name;
+    private Long parentId;
     private String imgLocation;
-    private int minPrice;
-    private int maxPrice;
-    private int totalReviews;
+    private boolean parentCategory;
 }

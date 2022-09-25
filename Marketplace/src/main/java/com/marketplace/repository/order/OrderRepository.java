@@ -1,13 +1,15 @@
 package com.marketplace.repository.order;
 
+import com.marketplace.service.order.OrderQuery;
+
 import java.util.List;
 
 public interface OrderRepository {
     public long addOrder(long userId);
 
-    public List<DbOrderedProduct> getOrder(long orderId);
+    public List<OrderedProduct> getOrder(long orderId);
 
-    public List<DbOrderedProduct> getAllOrders(long userId);
+    public List<OrderedProduct> getAllOrders(long userId);
 
     public boolean addProductToOrder(OrderQuery orderQuery);
 

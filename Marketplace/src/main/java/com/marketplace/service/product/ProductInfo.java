@@ -16,7 +16,6 @@ public class ProductInfo {
     private long categoryId;
     private String name;
     private MultipartFile imgFile;
-    private FileSystemResource imgResource;
 
     private List<Long> characteristics;
 }

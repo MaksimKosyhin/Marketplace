@@ -1,5 +1,6 @@
 package com.marketplace.repository.order;
 
+import com.marketplace.service.order.OrderQuery;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,7 +33,7 @@ public class JdbcOrderRepository implements OrderRepository{
     }
 
     @Override
-    public List<DbOrderedProduct> getOrder(long orderId) {
+    public List<OrderedProduct> getOrder(long orderId) {
         String sql = "SELECT " +
                     "order_id, " +
                     "products.product_id AS product_id, " +
@@ -55,13 +56,13 @@ public class JdbcOrderRepository implements OrderRepository{
 
         return jdbcTemplate.query(
                 sql,
-                new BeanPropertyRowMapper<DbOrderedProduct>(DbOrderedProduct.class),
+                new BeanPropertyRowMapper<OrderedProduct>(OrderedProduct.class),
                 orderId
         );
     }
 
     @Override
-    public List<DbOrderedProduct> getAllOrders(long userId) {
+    public List<OrderedProduct> getAllOrders(long userId) {
         String sql = "SELECT " +
                 "orders.order_id AS order_id, " +
                 "products.product_id AS product_id, " +
@@ -88,7 +89,7 @@ public class JdbcOrderRepository implements OrderRepository{
 
         return jdbcTemplate.query(
                 sql,
-                new BeanPropertyRowMapper<DbOrderedProduct>(DbOrderedProduct.class),
+                new BeanPropertyRowMapper<OrderedProduct>(OrderedProduct.class),
                 userId
         );
     }
@@ -161,7 +162,7 @@ public class JdbcOrderRepository implements OrderRepository{
 
     @Override
     public long getUserId(String username) {
-        String sql = "SELECT user_id " +
+        String sql = "SELECT COALESCE(user_id, -1) " +
                 "FROM users " +
                 "WHERE username = ?";
 

@@ -17,24 +17,6 @@ public class CategoryController {
         this.service = service;
     }
 
-    @GetMapping("{parentId}/new")
-    public String addCategory(@PathVariable long parentId, Model model) {
-//        model.addAttribute("category", new CategoryInfo(parentId));
-        return "new-category";
-    }
-
-    @PostMapping
-    public String addCategory(@ModelAttribute CategoryInfo categoryInfo) {
-        service.addCategory(categoryInfo);
-        return "redirect:/categories" + categoryInfo.getParentId();
-    }
-
-    @PutMapping("{categoryId}")
-    public String removeCategory(@PathVariable long categoryId) {
-        service.removeCategory(categoryId);
-        return "redirect:/categories";
-    }
-
     @GetMapping(value = {"", "{categoryId}"})
     public String getCategories(@PathVariable(required = false) Long categoryId,
                                 RedirectAttributes attributes, Model model) {
@@ -54,6 +36,25 @@ public class CategoryController {
 
             return "redirect:/categories/products";
         }
+    }
+
+    @GetMapping("{parentId}/new")
+    public String addCategory(@PathVariable long parentId, Model model) {
+        model.addAttribute("parentId", parentId);
+        model.addAttribute("category", new CategoryInfo());
+        return "new-category";
+    }
+
+    @PostMapping
+    public String addCategory(@ModelAttribute CategoryInfo categoryInfo) {
+        service.addCategory(categoryInfo);
+        return "redirect:/categories/" + categoryInfo.getParentId();
+    }
+
+    @PutMapping("{categoryId}")
+    public String removeCategory(@PathVariable long categoryId) {
+        service.removeCategory(categoryId);
+        return "redirect:/categories";
     }
 
     @GetMapping("/products")

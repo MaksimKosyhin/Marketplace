@@ -30,6 +30,7 @@
 </div>
 
 <div>
+    <p th:text="${categoryId}"></p>
     <form th:method="GET" th:action="@{/categories/{parentId}/new(parentId = ${categoryId})}">
         <input type="submit" value="Add Subcategory"/>
     </form>
@@ -37,10 +38,12 @@
 
 <div>
     <ul>
-        <li th:each = "categoryInfo : ${categories}">
-            <a th:method="GET" th:text="${categoryInfo.name}" th:href="@{categories/{categoryId}(categoryId=${categoryInfo.categoryId})}"></a>
-
-            <form th:method="PUT" th:action="@{/categories/{categoryId}(categoryId=${categoryInfo.categoryId})}">
+        <li th:each = "category : ${categories}">
+            <img th:src="@{${category.imgLocation}}" th:alt="${category.imgLocation}">
+            <br>
+            <a th:method="GET" th:text="${category.name}" th:href="@{categories/{categoryId}(categoryId=${category.categoryId})}"></a>
+            <br>
+            <form th:method="PUT" th:action="@{/categories/{categoryId}(categoryId=${category.categoryId})}">
                 <input type="submit" value="Remove"/>
             </form>
         </li>

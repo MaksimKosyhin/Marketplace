@@ -8,7 +8,6 @@ import java.util.List;
 
 public interface CategoryService {
     public boolean isParentCategory(long categoryId);
-    public boolean containsSubcategories(long categoryId);
 
     public void addCategory(CategoryInfo categoryInfo);
 

@@ -10,13 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 @ToString
 public class CategoryInfo {
     private long parentId;
-    private String parentName;
     private String name;
     private MultipartFile imgFile;
     private boolean parentCategory;
-
-    public CategoryInfo(long parentId, String parentName) {
-        this.parentId = parentId;
-        this.parentCategory = false;
-    }
 }

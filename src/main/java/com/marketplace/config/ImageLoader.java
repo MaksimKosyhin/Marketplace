@@ -9,7 +9,7 @@ import java.nio.file.Paths;
 
 public class ImageLoader {
     private final Path root =
-            Paths.get("src", "main", "resources", "static").toAbsolutePath();
+            Paths.get("Marketplace","src", "main", "resources", "static").toAbsolutePath();
 
     public String save(MultipartFile imgFile, String... dirs) {
         Path fullPath = root;

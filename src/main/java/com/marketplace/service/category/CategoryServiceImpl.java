@@ -36,28 +36,18 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public boolean containsSubcategories(long categoryId) {
-        if(repository.isParentCategory(categoryId)) {
-            return repository.containsSubcategories(categoryId);
-        } else {
-            throw new ParentCategoryException(
-                    String.format("category with id: %d is not parent category", categoryId));
-        }
-    }
-
-    @Override
     public void addCategory(CategoryInfo info) {
         if (!repository.categoryExists(info.getParentId())) {
             throw new NonExistingEntityException(
-                    "parent category for this category does not exist");
+                    String.format(
+                            "parent category with id: %d does not exist", info.getParentId()));
         }
 
         Category category = mapper.toCategory(info);
 
         String imgLocation = imageLoader.save(
                 info.getImgFile(),
-                "category",
-                info.getParentName()
+                "category"
         );
 
         category.setImgLocation(imgLocation);

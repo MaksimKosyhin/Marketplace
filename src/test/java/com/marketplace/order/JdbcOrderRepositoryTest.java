@@ -1,7 +1,7 @@
 package com.marketplace.order;
 
-import com.marketplace.repository.order.OrderedProduct;
 import com.marketplace.repository.order.OrderRepository;
+import com.marketplace.repository.order.OrderedProduct;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -90,7 +90,7 @@ public class JdbcOrderRepositoryTest {
                                 "laptopA",
                                 "path5",
                                 12,
-                                12,
+                                4,
                                 "shopA",
                                 "path8"),
                         new OrderedProduct(
@@ -101,7 +101,7 @@ public class JdbcOrderRepositoryTest {
                                 "laptopB",
                                 "path6",
                                 3,
-                                12,
+                                3,
                                 "shopA",
                                 "path8"),
                         new OrderedProduct(
@@ -112,7 +112,7 @@ public class JdbcOrderRepositoryTest {
                                 "laptopC",
                                 "path7",
                                 4,
-                                12,
+                                2,
                                 "shopB",
                                 "path9")
                 )

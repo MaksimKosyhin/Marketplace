@@ -1,13 +1,15 @@
-package com.marketplace.repository.category;
+package com.marketplace.service.shop;
 
 import lombok.*;
 
-@NoArgsConstructor
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode
 @ToString
 public class Shop {
     private long shopId;
     private String name;
+    private String imgLocation;
 }

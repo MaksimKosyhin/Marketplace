@@ -1,6 +1,5 @@
 package com.marketplace.service.user;
 
-import com.marketplace.repository.user.DbUser;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 

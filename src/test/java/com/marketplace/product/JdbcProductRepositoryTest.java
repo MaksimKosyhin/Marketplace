@@ -112,7 +112,7 @@ class JdbcProductRepositoryTest {
    @Test
     public void returnsProductCharacteristics() {
         assertThat(repository.getProductCharacteristics(1)).isEqualTo(
-                List.of(new ProductCharacteristic("color", "red"))
+                List.of(new ProductCharacteristic(1L, "color", "red"))
         );
    }
 
@@ -139,7 +139,7 @@ class JdbcProductRepositoryTest {
 
    @Test
     public void removesShopProduct() {
-        //when
+       //when
        repository.removeShopProduct(1, 1);
 
        //then
@@ -149,25 +149,5 @@ class JdbcProductRepositoryTest {
                        "WHERE " +
                        "product_id = 1 AND " +
                        "shop_id = 1", Boolean.class)).isTrue();
-   }
-
-   @Test
-   public void removesShopDependentEntities() {
-        //when
-       repository.removeShop(1);
-
-       assertThat(template.queryForObject(
-               "SELECT removed " +
-                       "FROM shops " +
-                       "WHERE shop_id = 1", Boolean.class))
-               .isTrue();
-
-       assertThat(template.queryForObject(
-               "SELECT COUNT(*) " +
-                       "FROM shop_products " +
-                       "WHERE " +
-                       "shop_id = 1 AND " +
-                       "removed = FALSE", Long.class))
-               .isZero();
    }
 }

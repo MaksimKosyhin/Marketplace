@@ -1,21 +1,25 @@
 package com.marketplace.service.product;
 
-import com.marketplace.repository.product.ShopProduct;
+import com.marketplace.controller.product.ProductInfo;
+import com.marketplace.service.category.CategoryShop;
 
-import java.io.IOException;
+import java.util.List;
 
 public interface ProductService {
+
+    public long getCategoryId(long productId);
+
     public ProductDescription getProduct(long productId);
 
-    public void addProduct(ProductInfo productInfo) throws IOException;
+    public long addProduct(ProductInfo productInfo);
+
+    public List<ProductCharacteristicMap> getCategoryCharacteristic(long categoryId);
+
+    public List<CategoryShop> getShops();
 
     public void removeProduct(long productId);
 
     public void addShopProduct(ShopProductInfo info);
 
     public void removeShopProduct(long productId, long shopId);
-
-    public void addShop(Shop shop);
-
-    public void removeShop(long shopId);
 }

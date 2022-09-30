@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Shops</title>
+</head>
+<body>
+
+<div>
+    <form th:method="POST" th:action="@{/categories/shops}" th:object="${shop}" enctype="multipart/form-data">
+        <label for="name">Name</label>
+        <input type="text" th:field="*{product.name}" id="name">
+        <br>
+        <label for="image">Image</label>
+        <input type="file" id="image" name="imgFile" accept="image/*">
+        <br>
+        <input type="submit" value="Add">
+    </form>
+</div>
+
+<div th:each="shop: ${shops}">
+    <img th:src="@{${shop.imgLocation}}" th:alt="${shop.imgLocation}">
+    <p th:text="${shop.name}">
+    <form th:method="PUT" th:action="@{/categories/shops/{shopId}(shopId = ${shop.shopId})">
+        <input type="submit" value="logout"/>
+    </form>
+</div>
+
+</body>
+</html>

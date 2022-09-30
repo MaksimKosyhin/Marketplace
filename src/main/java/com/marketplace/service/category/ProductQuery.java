@@ -1,13 +1,10 @@
 package com.marketplace.service.category;
 
-import com.marketplace.service.category.SortingOption;
 import lombok.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @AllArgsConstructor
-@NoArgsConstructor
 @Getter
 @Setter
 @EqualsAndHashCode
@@ -16,24 +13,19 @@ public class ProductQuery {
     private long categoryId;
     private List<Long> characteristicsId;
     private SortingOption sortingOption;
-    private long startId;
     private long size;
     private boolean orderDescending;
 
-    public ProductQuery(long categoryId, long size, List<Long> characteristicsId) {
+    public ProductQuery(long categoryId, List<Long> characteristicsId, long size) {
         this.categoryId = categoryId;
         this.characteristicsId = characteristicsId;
         this.sortingOption = SortingOption.NO_SORTING;
-        this.startId = 0;
         this.size = size;
+        this.orderDescending = false;
     }
 
-    public boolean isOrderDescending() {
-        return orderDescending;
-    }
-
-    public SortingOption getSortingOption() {
-        return sortingOption;
+    public ProductQuery() {
+        this.sortingOption = SortingOption.NO_SORTING;
     }
 
     public int getNumberOfCharacteristics() {

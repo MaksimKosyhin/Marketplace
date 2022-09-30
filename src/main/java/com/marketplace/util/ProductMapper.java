@@ -1,12 +1,9 @@
 package com.marketplace.util;
 
 import com.marketplace.repository.product.Product;
-import com.marketplace.repository.product.ProductCharacteristic;
-import com.marketplace.service.product.ProductInfo;
 import com.marketplace.service.product.ProductDescription;
+import com.marketplace.controller.product.ProductInfo;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 @Component
 public class ProductMapper {

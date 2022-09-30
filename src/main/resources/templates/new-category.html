@@ -11,11 +11,11 @@
         <label for="name">Enter name:</label>
         <input type="text" th:field="*{name}" id="name">
         <br>
-        <label for="image">Choose categoryInfo image</label>
-        <input type="file" id="image" name="imgFile" accept="image/*" class="form-control-file">
+        <label for="image">Image</label>
+        <input type="file" id="image" name="imgFile" accept="image/*">
         <br>
         <label for="parentCategory">Parent Category</label>
-        <input type="checkbox" id="parentCategory" name="parentCategory" value="true">
+        <input type="checkbox" id="parentCategory" th:field="category.parentCategory" value="true">
         <br>
         <input type="submit" value="Add"/>
     </form>

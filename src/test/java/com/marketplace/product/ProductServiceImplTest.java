@@ -2,8 +2,9 @@ package com.marketplace.product;
 
 import com.marketplace.config.ImageLoader;
 import com.marketplace.repository.product.Product;
+import com.marketplace.repository.product.ProductCharacteristic;
 import com.marketplace.repository.product.ProductRepository;
-import com.marketplace.service.product.ProductInfo;
+import com.marketplace.controller.product.ProductInfo;
 import com.marketplace.service.product.ProductServiceImpl;
 import com.marketplace.util.ProductMapper;
 import org.junit.jupiter.api.Test;
@@ -12,12 +13,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.mock.web.MockMultipartFile;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
@@ -65,8 +64,10 @@ public class ProductServiceImplTest {
                 1,
                 "test",
                 new MockMultipartFile("test", new byte[] {}),
-                List.of(1L, 2L, 3L)
+                List.of()
         );
+
+        List<Long> characteristicsId = List.of(1L, 2L, 3L);
 
         given(repository.addProduct(any())).willReturn(1L);
         given(mapper.toProduct(any(ProductInfo.class))).willReturn(new Product());

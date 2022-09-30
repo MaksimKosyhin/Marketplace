@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Products</title>
+</head>
+<body>
+
+<div>
+    <form th:method="POST" th:action="@{/products}" th:object="${product}" enctype="multipart/form-data">
+        <label for="name">Name: </label>
+        <input type="text" th:field="*{product.name}" id="name">
+        <br>
+        <label for="image">Image</label>
+        <input type="file" id="image" name="imgFile" accept="image/*">
+
+        <div th:each="characteristic: ${product.characteristics}">
+            <p th:text="${characteristic.name}"></p>
+
+            <div th:each="details: ${characteristic.values}">
+                <input type="radio" th:id="${}" th:field="*{characteristic.includedCharacteristic}" th:value="${details.key}">
+                <label th:for="${details.value}" th:text="${details.value}"></label>
+            </div>
+
+        </div>
+
+        <input type="submit" value="Send">
+    </form>
+</div>
+
+</body>
+</html>

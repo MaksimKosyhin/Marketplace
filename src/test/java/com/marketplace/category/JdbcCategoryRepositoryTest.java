@@ -1,11 +1,8 @@
 package com.marketplace.category;
 
 import com.marketplace.repository.category.*;
-import com.marketplace.repository.category.Category;
-import com.marketplace.repository.category.Characteristic;
-import com.marketplace.repository.category.ProductInfo;
 import com.marketplace.service.category.ProductQuery;
-import com.marketplace.service.category.SortingOption;
+import com.marketplace.service.category.CategoryShop;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -75,20 +72,20 @@ public class JdbcCategoryRepositoryTest {
 
     @Test
     public void returnsCategories() {
-        assertThat(repository.getCategories(1)).isEqualTo(
+        assertThat(repository.getCategories(2)).isEqualTo(
                 List.of(
-                        new Category(2L, "laptops", 1L, "path2", false),
-                        new Category(3L, "tablets", 1L, "path3", false)
+                        new Category(3L, "laptops", 2L, "path2", false),
+                        new Category(4L, "tablets", 2L, "path3", false)
                 )
         );
     }
 
     @Test
     public void returnsCharacteristics() {
-        assertThat(repository.getCharacteristics(2)).isEqualTo(
+        assertThat(repository.getCharacteristics(3)).isEqualTo(
                 List.of(
-                        new Characteristic(1L, 2L, "color", "red"),
-                        new Characteristic(2L, 2L, "color", "black")
+                        new Characteristic(1L, 3L, "color", "red"),
+                        new Characteristic(2L, 3L, "color", "black")
                 )
         );
     }
@@ -144,16 +141,50 @@ public class JdbcCategoryRepositoryTest {
                 35
         );
 
+        //then
+        assertThat(repository.getProducts(List.of(1L, 2L))).isEqualTo(List.of(info1, info2));
+    }
+
+    @Test
+    public void returnsProductsId() {
+
         ProductQuery query = new ProductQuery(
-                2,
+                3,
                 List.of(1L),
-                SortingOption.PRICE,
-                0,
-                100,
-                true
+                100
         );
 
-        //then
-        assertThat(repository.getProducts(query)).isEqualTo(List.of(info1, info2));
+        assertThat(repository.getProductsId(query)).isEqualTo(List.of(1L, 2L));
+    }
+
+    @Test
+    public void returnsShops() {
+        List<CategoryShop> expected = List.of(
+                new CategoryShop(1, "shopA", "path8", true),
+                new CategoryShop(2, "shopB", "path9", true),
+                new CategoryShop(3,"shopC","path10",false)
+        );
+
+        assertThat(repository.getShops(3)).containsExactlyInAnyOrderElementsOf(expected);
+    }
+
+    @Test
+    public void removesShopDependentEntities() {
+        //when
+        repository.removeShop(1);
+
+        assertThat(template.queryForObject(
+                "SELECT removed " +
+                        "FROM shops " +
+                        "WHERE shop_id = 1", Boolean.class))
+                .isTrue();
+
+        assertThat(template.queryForObject(
+                "SELECT COUNT(*) " +
+                        "FROM shop_products " +
+                        "WHERE " +
+                        "shop_id = 1 AND " +
+                        "removed = FALSE", Long.class))
+                .isZero();
     }
 }

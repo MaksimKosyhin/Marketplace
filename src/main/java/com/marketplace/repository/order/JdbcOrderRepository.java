@@ -35,24 +35,24 @@ public class JdbcOrderRepository implements OrderRepository{
     @Override
     public List<OrderedProduct> getOrder(long orderId) {
         String sql = "SELECT " +
-                    "order_id, " +
-                    "products.product_id AS product_id, " +
-                    "shops.shop_id AS shop_id, " +
-                    "products.name AS product_name, " +
-                    "products.img_location AS product_img_location, " +
-                    "amount, " +
-                    "price, " +
-                    "shops.name AS shop_name, " +
-                    "shops.img_location AS shop_img_location " +
+                "order_id, " +
+                "products.product_id AS product_id, " +
+                "shops.shop_id AS shop_id, " +
+                "products.name AS product_name, " +
+                "products.img_location AS product_img_location, " +
+                "amount, " +
+                "price, " +
+                "shops.name AS shop_name, " +
+                "shops.img_location AS shop_img_location " +
                 "FROM products " +
                 "INNER JOIN shop_products " +
-                    "USING(product_id) " +
+                "USING(product_id) " +
                 "INNER JOIN shops " +
-                    "USING(shop_id)" +
+                "USING(shop_id)" +
                 "INNER JOIN order_shop_products " +
-                    "USING(product_id) " +
+                "USING(product_id) " +
                 "WHERE " +
-                    "order_id = ?";
+                "order_id = ?";
 
         return jdbcTemplate.query(
                 sql,

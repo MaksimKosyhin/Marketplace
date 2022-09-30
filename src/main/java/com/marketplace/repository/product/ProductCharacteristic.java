@@ -9,6 +9,7 @@ import lombok.*;
 @EqualsAndHashCode
 @ToString
 public class ProductCharacteristic {
+    private long characteristicId;
     private String name;
     private String characteristicValue;
 }

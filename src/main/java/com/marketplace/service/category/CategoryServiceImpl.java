@@ -3,12 +3,13 @@ package com.marketplace.service.category;
 import com.marketplace.config.ImageLoader;
 import com.marketplace.config.exception.AddEntryException;
 import com.marketplace.config.exception.ModifyingEntryException;
-import com.marketplace.controller.category.CategoryInfo;
-import com.marketplace.controller.category.CategoryShops;
-import com.marketplace.repository.category.ProductInfo;
-import com.marketplace.repository.category.*;
 import com.marketplace.config.exception.NonExistingEntityException;
 import com.marketplace.config.exception.ParentCategoryException;
+import com.marketplace.controller.category.CategoryInfo;
+import com.marketplace.controller.category.CategoryShops;
+import com.marketplace.controller.category.ProductList;
+import com.marketplace.controller.shop.ShopInfo;
+import com.marketplace.repository.category.*;
 import com.marketplace.util.CategoryMapper;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -91,27 +92,57 @@ public class CategoryServiceImpl implements CategoryService {
             throw new AddEntryException("Cannot add shops to parent category");
         }
 
-        for(Shop shop: shops.getShops()) {
-            if(!repository.addShopToCategory(shop.getShopId(), shops.getCategoryId())) {
-                throw new AddEntryException("shop was not added to category");
+        for(CategoryShop shop: shops.getShops()) {
+            if(shop.isPresentInCategory()) {
+                if (!repository.addShopToCategory(shop.getShopId(), shop.getShopId())) {
+                    throw new AddEntryException("shop was not added to category");
+                }
             }
         }
     }
 
     @Override
-    public List<Shop> getShops() {
-        return repository.getShops();
+    public Map<Boolean, List<CategoryShop>> getShops(long categoryId) {
+        return repository.getShops(categoryId)
+                .stream()
+                .collect(Collectors.partitioningBy(CategoryShop::isPresentInCategory));
+    }
+
+    private List<Long> getCharacteristicsId(long categoryId) {
+        if(repository.categoryExists(categoryId)) {
+            return repository.getCharacteristicsId(categoryId);
+        } else {
+            throw new NonExistingEntityException(
+                    String.format("category with id: %s does not exist", categoryId));
+        }
     }
 
     @Override
-    public List<ProductInfo> getProducts(ProductQuery productQuery) {
-        if (repository.isParentCategory(productQuery.getCategoryId())) {
-            throw new ParentCategoryException("This category includes other categories");
-        } else if (!repository.categoryExists(productQuery.getCategoryId())) {
-            throw new NonExistingEntityException("Category does not exist");
-        } else {
-            return repository.getProducts(productQuery);
+    public List<ProductInfo> getProducts(List<Long> productsId) {
+        return repository.getProducts(productsId);
+    }
+
+    @Override
+    public ProductQuery getProductQuery(long categoryId, int size) {
+        return new ProductQuery(categoryId, getCharacteristicsId(categoryId), size);
+    }
+
+    @Override
+    public ProductList getProductList(ProductQuery query) {
+        Map<Integer, List<Long>> pages = new HashMap<>();
+
+        int page = 1;
+        pages.put(page, new ArrayList<>());
+
+        for(Long id: repository.getProductsId(query)) {
+            if(pages.get(page).size() == query.getSize()) {
+                pages.put(++page, new ArrayList<>());
+            } else {
+                pages.get(page).add(id);
+            }
         }
+
+        return new ProductList(pages);
     }
 
     @Override
@@ -132,16 +163,6 @@ public class CategoryServiceImpl implements CategoryService {
             return combineCharacteristicValues(getGroupedByName(categoryId));
         } else {
             throw new NonExistingEntityException("Category does not exist");
-        }
-    }
-
-    @Override
-    public List<Long> getCharacteristicsId(long categoryId) {
-        if(repository.categoryExists(categoryId)) {
-            return repository.getCharacteristicsId(categoryId);
-        } else {
-            throw new NonExistingEntityException(
-                    String.format("category with id: %s does not exist", categoryId));
         }
     }
 

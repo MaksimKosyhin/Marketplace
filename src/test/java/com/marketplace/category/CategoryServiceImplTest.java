@@ -2,9 +2,11 @@ package com.marketplace.category;
 
 import com.marketplace.config.ImageLoader;
 import com.marketplace.controller.category.CategoryInfo;
+import com.marketplace.repository.category.Category;
+import com.marketplace.repository.category.Characteristic;
+import com.marketplace.repository.category.JdbcCategoryRepository;
+import com.marketplace.service.category.CategoryServiceImpl;
 import com.marketplace.service.category.CharacteristicMap;
-import com.marketplace.repository.category.*;
-import com.marketplace.service.category.*;
 import com.marketplace.util.CategoryMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
@@ -104,23 +106,6 @@ class CategoryServiceImplTest {
 
         //then
         verify(categoryRepository).removeCategory(anyLong());
-    }
-
-    @Test
-    void returnsProductsInfo() {
-        //given
-        ProductQuery productQuery = new ProductQuery();
-
-        given(categoryRepository.isParentCategory(productQuery.getCategoryId()))
-                .willReturn(false);
-        given(categoryRepository.categoryExists(productQuery.getCategoryId()))
-                .willReturn(true);
-
-        //when
-        categoryService.getProducts(productQuery);
-
-        //then
-        verify(categoryRepository).getProducts(productQuery);
     }
 
     @Test

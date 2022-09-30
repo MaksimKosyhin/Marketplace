@@ -1,13 +1,12 @@
 package com.marketplace.config;
 
-import javax.sql.DataSource;
-
 import org.flywaydb.core.Flyway;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import javax.sql.DataSource;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 

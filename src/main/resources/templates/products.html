@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Products</title>
+</head>
+<body>
+    <div>
+        <a th:method="GET" text="" th:action="@{/categories/{categoryId}/characteristic(categoryId = ${categoryId})}">
+            Add characteristic
+        </a>
+        <br>
+        <a th:method="GET" th:href="@{/products/{categoryId}/new(categoryId = ${product.categoryId}})}">
+            Add new product
+        </a>
+    </div>
+
+    <div>
+        <form th:method="POST" th:action="@{/categories/{categoryId}(categoryId = ${categoryId})}" th:object="${query}">
+
+            <input type="hidden" name="categoryId" th:value="${oldQuery.categoryId}">
+            <input type="hidden" name="startId" th:value="${}">
+
+            <div th:each="characteristic: ${characteristics}">
+                <p th:text="${characteristic.name}"></p>
+                <table>
+                    <tr th:each="element : ${characteristic.values}">
+                        <p th:text="${element.value}"></p>
+                    </tr>
+                </table>
+            </div>
+            <div>
+                <input type="submit" value="Search"/>
+            </div>
+        </form>
+    </div>
+
+    <div>
+        <div th:each="product: ${products}">
+            <img th:src="@{${product.imgLocation}}" th:alt="${product.imgLocation}">
+            <br>
+            <a th:method="GET" th:text="${product.name}" th:href="@{/products/{productId}(productId = ${product.productId})}"></a>
+            <br>
+            <span th:text="${product.minPrice}"></span>
+            <span th:unless="${product.minPrice} == ${product.maxPrice}" th:text="' - ' + ${product.maxPrice}"></span>
+            <br>
+            <span th:text="${product.totalReviews}"></span>
+        </div>
+    </div>
+</body>
+</html>

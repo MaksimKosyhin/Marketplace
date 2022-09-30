@@ -1,17 +1,22 @@
 
 INSERT INTO categories(name, img_location, parent_category) VALUES ('electronics', 'path1', TRUE);
-INSERT INTO categories(parent_id, name, img_location, parent_category) VALUES (1, 'laptops', 'path2', FALSE);
-INSERT INTO categories(parent_id, name, img_location, parent_category) VALUES (1, 'tablets', 'path3', FALSE);
-INSERT INTO categories(parent_id, name, img_location, parent_category, removed) VALUES (1, 'phones', 'path4', FALSE, TRUE);
+INSERT INTO categories(parent_id, name, img_location, parent_category) VALUES (2, 'laptops', 'path2', FALSE);
+INSERT INTO categories(parent_id, name, img_location, parent_category) VALUES (2, 'tablets', 'path3', FALSE);
+INSERT INTO categories(parent_id, name, img_location, parent_category, removed) VALUES (2, 'phones', 'path4', FALSE, TRUE);
 
-INSERT INTO products(name, category_id, img_location) VALUES ('laptopA', 2, 'path5');
-INSERT INTO products(name, category_id, img_location) VALUES ('laptopB', 2, 'path6');
-INSERT INTO products(name, category_id, img_location, removed) VALUES ('laptopC', 2, 'path7', TRUE);
+INSERT INTO products(name, category_id, img_location) VALUES ('laptopA', 3, 'path5');
+INSERT INTO products(name, category_id, img_location) VALUES ('laptopB', 3, 'path6');
+INSERT INTO products(name, category_id, img_location, removed) VALUES ('laptopC', 3, 'path7', TRUE);
 
 INSERT INTO shops(name, img_location) VALUES ('shopA', 'path8');
 INSERT INTO shops(name, img_location) VALUES ('shopB', 'path9');
 INSERT INTO shops(name, img_location) VALUES ('shopC', 'path10');
 INSERT INTO shops(name, img_location, removed) VALUES ('shopD', 'path11', TRUE);
+
+INSERT INTO category_shops(category_id, shop_id) VALUES(3, 1);
+INSERT INTO category_shops(category_id, shop_id) VALUES(3, 2);
+INSERT INTO category_shops(category_id, shop_id) VALUES(4, 1);
+INSERT INTO category_shops(category_id, shop_id) VALUES(4, 3);
 
 INSERT INTO shop_products(product_id, shop_id, link, score, price, reviews)
     VALUES(1, 1, 'link1', 3, 4, 2);
@@ -37,8 +42,8 @@ INSERT INTO shop_products(product_id, shop_id, link, score, price, reviews)
 INSERT INTO shop_products(product_id, shop_id, link, score, price, reviews, removed)
     VALUES(1, 4, 'link10', 7, 22, 10, TRUE);
 
-INSERT INTO characteristics(category_id, name, characteristic_value) VALUES (2, 'color', 'red');
-INSERT INTO characteristics(category_id, name, characteristic_value) VALUES (2, 'color', 'black');
+INSERT INTO characteristics(category_id, name, characteristic_value) VALUES (3, 'color', 'red');
+INSERT INTO characteristics(category_id, name, characteristic_value) VALUES (3, 'color', 'black');
 
 INSERT INTO product_characteristics(product_id, characteristic_id) VALUES (1, 1);
 INSERT INTO product_characteristics(product_id, characteristic_id) VALUES (2, 1);

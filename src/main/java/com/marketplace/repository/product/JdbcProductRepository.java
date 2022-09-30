@@ -1,6 +1,6 @@
 package com.marketplace.repository.product;
 
-import com.marketplace.service.product.Shop;
+import com.marketplace.service.category.CategoryShop;
 import com.marketplace.service.product.ShopProductInfo;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -10,18 +10,10 @@ import java.util.List;
 
 public class JdbcProductRepository implements  ProductRepository{
 
-    private final JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate template;
 
-    public JdbcProductRepository(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
-
-    private int getCountOfShopUpdatedEntities(long shopId) {
-        String sql = "SELECT COUNT(*) " +
-                "FROM shop_products " +
-                "WHERE shop_id = ?";
-
-        return 1 + jdbcTemplate.queryForObject(sql, Integer.class, shopId);
+    public JdbcProductRepository(JdbcTemplate template) {
+        this.template = template;
     }
 
     private int getCountOfProductUpdatedEntities(long productId) {
@@ -29,7 +21,7 @@ public class JdbcProductRepository implements  ProductRepository{
                 "FROM shop_products " +
                 "WHERE product_id = ?";
 
-        return 1 + jdbcTemplate.queryForObject(sql, Integer.class, productId);
+        return 1 + template.queryForObject(sql, Integer.class, productId);
     }
 
     @Override
@@ -40,7 +32,16 @@ public class JdbcProductRepository implements  ProductRepository{
                 "WHERE product_id = ? " +
                 "LIMIT 1)";
 
-        return jdbcTemplate.queryForObject(sql, Boolean.class, productId);
+        return template.queryForObject(sql, Boolean.class, productId);
+    }
+
+    @Override
+    public long getCategoryId(long productId) {
+        String sql = "SELECT category_id " +
+                "FROM products " +
+                "WHERE product_id = ?";
+
+        return template.queryForObject(sql, Long.class, productId);
     }
 
     @Override
@@ -52,11 +53,23 @@ public class JdbcProductRepository implements  ProductRepository{
                 "FROM products " +
                 "WHERE product_id = ?";
 
-        return jdbcTemplate.queryForObject(
+        return template.queryForObject(
                 sql,
                 new BeanPropertyRowMapper<Product>(Product.class),
                 productId
         );
+    }
+
+    @Override
+    public List<CategoryShop> getShops() {
+        String sql = "SELECT " +
+                    "shop_id, " +
+                    "name, " +
+                    "img_location " +
+                "FROM shops " +
+                "WHERE removed = FALSE";
+
+        return template.query(sql, new BeanPropertyRowMapper<CategoryShop>(CategoryShop.class));
     }
 
     @Override
@@ -76,7 +89,7 @@ public class JdbcProductRepository implements  ProductRepository{
                     "shops.removed = FALSE AND " +
                     "shop_products.removed = FALSE";
 
-        return jdbcTemplate.query(
+        return template.query(
                 sql,
                 new BeanPropertyRowMapper<ShopProduct>(ShopProduct.class),
                 productId
@@ -93,11 +106,25 @@ public class JdbcProductRepository implements  ProductRepository{
                     "USING(characteristic_id)" +
                 "WHERE product_id = ?";
 
-        return jdbcTemplate.query(
+        return template.query(
                 sql,
                 new BeanPropertyRowMapper<ProductCharacteristic>(ProductCharacteristic.class),
                 productId
         );
+    }
+
+    @Override
+    public List<ProductCharacteristic> getCategoryCharacteristics(long categoryId) {
+        String sql = "SELECT " +
+                "characteristic_id, " +
+                "name, " +
+                "characteristic_value " +
+                "FROM characteristics " +
+                "WHERE category_id = ?";
+
+        return template.query(sql,
+                new BeanPropertyRowMapper<ProductCharacteristic>(ProductCharacteristic.class),
+                categoryId);
     }
 
     @Override
@@ -110,7 +137,7 @@ public class JdbcProductRepository implements  ProductRepository{
                 "RETURNING product_id";
 
         try {
-            return jdbcTemplate.queryForObject(
+            return template.queryForObject(
                     sql,
                     Long.class,
                     product.getCategoryId(),
@@ -133,7 +160,7 @@ public class JdbcProductRepository implements  ProductRepository{
                 "reviews) " +
                 "VALUES(?,?,?,?,?)";
 
-        int updated = jdbcTemplate.update(
+        int updated = template.update(
                 sql,
                 info.getShopId(),
                 info.getProductId(),
@@ -147,34 +174,13 @@ public class JdbcProductRepository implements  ProductRepository{
     }
 
     @Override
-    public long addShop(Shop shop) {
-        String sql = "INSERT INTO shops(" +
-                "name, " +
-                "img_location, " +
-                ") " +
-                "VALUES(?,?) " +
-                "RETURNING shop_id";
-
-        try {
-            return jdbcTemplate.queryForObject(
-                    sql,
-                    Long.class,
-                    shop.getName(),
-                    shop.getImgLocation()
-            );
-        } catch (Exception ex) {
-            return -1;
-        }
-    }
-
-    @Override
     public boolean addCharacteristicToProduct(long productId, long characteristicId) {
         String sql = "INSERT INTO product_characteristics(" +
                     "product_id, " +
                     "characteristic_ic) " +
                 "VALUES(?,?)";
 
-        int updated = jdbcTemplate.update(sql, productId, characteristicId);
+        int updated = template.update(sql, productId, characteristicId);
 
         return updated == 1;
     }
@@ -187,12 +193,12 @@ public class JdbcProductRepository implements  ProductRepository{
         String removeProduct = "UPDATE products " +
                 "SET removed = TRUE " +
                 "WHERE product_id = ?";
-        updated += jdbcTemplate.update(removeProduct, productId);
+        updated += template.update(removeProduct, productId);
 
         String removeShopProducts = "UPDATE shop_products " +
                 "SET removed = TRUE " +
                 "WHERE product_id = ?";
-        updated += jdbcTemplate.update(removeShopProducts, productId);
+        updated += template.update(removeShopProducts, productId);
 
         return updated == getCountOfProductUpdatedEntities(productId);
     }
@@ -202,26 +208,8 @@ public class JdbcProductRepository implements  ProductRepository{
         String sql = "UPDATE shop_products " +
                 "SET removed = TRUE " +
                 "WHERE product_id = ? AND shop_id = ?";
-        int updated = jdbcTemplate.update(sql, productId, shopId);
+        int updated = template.update(sql, productId, shopId);
 
         return updated == 1;
-    }
-
-    @Transactional
-    @Override
-    public boolean removeShop(long shopId) {
-        int updated = 0;
-
-        String removeShop = "UPDATE shops " +
-                "SET removed = TRUE " +
-                "WHERE shop_id = ?";
-        updated += jdbcTemplate.update(removeShop, shopId);
-
-        String removeShopProducts = "UPDATE shop_products " +
-                "SET removed = TRUE " +
-                "WHERE shop_id = ?";
-        updated += jdbcTemplate.update(removeShopProducts, shopId);
-
-        return updated == getCountOfShopUpdatedEntities(shopId);
     }
 }

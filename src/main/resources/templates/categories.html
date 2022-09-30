@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Add categoryInfo</title>
+    <title>Categories</title>
 </head>
 <body>
 
@@ -30,10 +30,7 @@
 </div>
 
 <div>
-    <p th:text="${categoryId}"></p>
-    <form th:method="GET" th:action="@{/categories/{parentId}/new(parentId = ${categoryId})}">
-        <input type="submit" value="Add Subcategory"/>
-    </form>
+    <a th:method="GET" th:href="@{/categories/{parentId}/new(parentId = ${categoryId})}">Add subcategory</a>
 </div>
 
 <div>

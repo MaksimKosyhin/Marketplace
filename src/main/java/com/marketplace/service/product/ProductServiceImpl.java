@@ -4,11 +4,16 @@ import com.marketplace.config.ImageLoader;
 import com.marketplace.config.exception.AddEntryException;
 import com.marketplace.config.exception.ModifyingEntryException;
 import com.marketplace.config.exception.NonExistingEntityException;
-import com.marketplace.repository.product.*;
+import com.marketplace.controller.product.ProductInfo;
+import com.marketplace.repository.product.Product;
+import com.marketplace.repository.product.ProductCharacteristic;
+import com.marketplace.repository.product.ProductRepository;
+import com.marketplace.service.category.CategoryShop;
 import com.marketplace.util.ProductMapper;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class ProductServiceImpl implements ProductService {
 
@@ -20,6 +25,17 @@ public class ProductServiceImpl implements ProductService {
         this.repository = repository;
         this.mapper = mapper;
         this.imageLoader = imageLoader;
+    }
+
+
+    @Override
+    public long getCategoryId(long productId) {
+        if(repository.productExists(productId)) {
+            return repository.getCategoryId(productId);
+        } else {
+            throw new NonExistingEntityException(
+                    String.format("product with id: %d does not exist", productId));
+        }
     }
 
     @Override
@@ -41,18 +57,47 @@ public class ProductServiceImpl implements ProductService {
 
     @Transactional
     @Override
-    public void addProduct(ProductInfo productInfo) {
-        Product product = mapper.toProduct(productInfo);
-        product.setImgLocation(imageLoader.save(productInfo.getImgFile(), "product", productInfo.getName()));
+    public long addProduct(ProductInfo info) {
+        Product product = mapper.toProduct(info);
+        product.setImgLocation(imageLoader.save(info.getImgFile(), "product", info.getName()));
 
         long productId = repository.addProduct(product);
         if (productId == -1) {
             throw new AddEntryException("product was not added");
         }
 
-        for (Long characteristicId : productInfo.getCharacteristics()) {
-            repository.addCharacteristicToProduct(productId, characteristicId);
+        for (ProductCharacteristicMap characteristic: info.getCharacteristics()) {
+            repository.addCharacteristicToProduct(productId, characteristic.getIncludedCharacteristic());
         }
+
+        return productId;
+    }
+
+    @Override
+    public List<ProductCharacteristicMap> getCategoryCharacteristic(long categoryId) {
+        return repository.getCategoryCharacteristics(categoryId)
+                .stream()
+                .collect(
+                        Collectors.collectingAndThen(
+                                Collectors.groupingBy(ProductCharacteristic::getName),
+                                this::mapValues
+                        )
+                );
+    }
+
+    @Override
+    public List<CategoryShop> getShops() {
+        return repository.getShops();
+    }
+
+    private List<ProductCharacteristicMap> mapValues(Map<String, List<ProductCharacteristic>> map) {
+        List<ProductCharacteristicMap> characteristics = new ArrayList<>();
+
+        for(Map.Entry<String, List<ProductCharacteristic>> entry: map.entrySet()) {
+            characteristics.add(new ProductCharacteristicMap(entry.getValue()));
+        }
+
+        return characteristics;
     }
 
     @Override
@@ -84,21 +129,6 @@ public class ProductServiceImpl implements ProductService {
                             productId,
                             shopId)
             );
-        }
-    }
-
-    @Override
-    public void addShop(Shop shop) {
-        if (repository.addShop(shop) == -1) {
-            throw new AddEntryException("shop was not added");
-        }
-    }
-
-    @Override
-    public void removeShop(long shopId) {
-        if (!repository.removeShop(shopId)) {
-            throw new ModifyingEntryException(
-                    String.format("shop with id: %d was not removed", shopId));
         }
     }
 }

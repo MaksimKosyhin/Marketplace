@@ -11,12 +11,20 @@ import java.util.Map;
 @EqualsAndHashCode
 @ToString
 public class ProductList {
+    private final boolean empty;
+
     private int currentPage;
     private Map<Integer, List<Long>> pages;
     private boolean firstPage;
     private boolean lastPage;
 
+    public ProductList() {
+        this.empty = true;
+    }
+
     public ProductList(Map<Integer, List<Long>> pages) {
+        this.empty = false;
+
         this.pages = pages;
         this.currentPage = 1;
         this.firstPage = true;

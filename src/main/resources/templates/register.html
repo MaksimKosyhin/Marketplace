@@ -13,11 +13,11 @@
         <input type="text" th:field="*{password}" id="password"/>
         <br>
         <label for="admin">Admin </label>
-        <input type="radio" th:field="*{role}" th:value="${T(com.marketplace.repository.user.UserRole).valueOf('ADMIN')}" id="admin" name="role"/>
+        <input type="radio" th:field="*{role}" th:value="${T(com.marketplace.repository.user.UserRole).valueOf('ADMIN')}" id="admin"/>
         <label for="moder">Moderator </label>
-        <input type="radio" th:field="*{role}" th:value="${T(com.marketplace.repository.user.UserRole).valueOf('MODERATOR')}" id="moder" name="role"/>
+        <input type="radio" th:field="*{role}" th:value="${T(com.marketplace.repository.user.UserRole).valueOf('MODERATOR')}" id="moder"/>
         <label for="user">User </label>
-        <input type="radio" th:field="*{role}" th:value="${T(com.marketplace.repository.user.UserRole).valueOf('USER')}" id="user" name="role"/>
+        <input type="radio" th:field="*{role}" th:value="${T(com.marketplace.repository.user.UserRole).valueOf('USER')}" id="user"/>
     </div>
 
     <div>

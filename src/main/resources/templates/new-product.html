@@ -18,7 +18,7 @@
             <p th:text="${characteristic.name}"></p>
 
             <div th:each="details: ${characteristic.values}">
-                <input type="radio" th:id="${}" th:field="*{characteristic.includedCharacteristic}" th:value="${details.key}">
+                <input type="radio" th:id="${details.value}" th:field="*{characteristic.includedCharacteristic}" th:value="${details.key}">
                 <label th:for="${details.value}" th:text="${details.value}"></label>
             </div>
 

@@ -9,7 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.IntStream;
 
 
 public class JdbcCategoryRepository implements  CategoryRepository{
@@ -93,7 +92,7 @@ public class JdbcCategoryRepository implements  CategoryRepository{
                         "BOOL_AND(shop_products.removed) AS shop_products_removed, " +
                         "BOOL_AND(shops.removed) AS shops_removed, " +
                         "BOOL_AND(characteristic_id IN (" +
-                            getParametersTemplate(query.getNumberOfCharacteristics()) +
+                            getInsertTemplate(query.getNumberOfCharacteristics()) +
                         ")) AS accepted_characteristics " +
                     "FROM products " +
                     "INNER JOIN shop_products " +
@@ -114,13 +113,49 @@ public class JdbcCategoryRepository implements  CategoryRepository{
                     "shops_removed = FALSE AND " +
                     "accepted_characteristics = TRUE";
 
-        System.out.println(sql);
-
         return template.queryForList(sql, Long.class, getQueryParameters(query));
     }
 
-    private String getParametersTemplate(int numberOfParameters) {
-        return String.join(",", Collections.nCopies(numberOfParameters, "?"));
+    private String getInsertTemplate(int numberOfParameters) {
+        return String.join(
+                ",",
+                Collections.nCopies(numberOfParameters == 0 ? 1 : numberOfParameters, "?")
+        );
+    }
+
+    private Object[] getQueryParameters(ProductQuery query) {
+        List<Long> params = query.getCharacteristicsId();
+        params.add(query.getCategoryId());
+
+        return  params.toArray();
+    }
+
+    @Override
+    public List<Long> getAllProductsId(ProductQuery query) {
+        String sql = "WITH id_list AS" +
+                    "(SELECT " +
+                        "products.product_id AS product_id, " +
+                        "BOOL_AND(shop_products.removed) AS shop_products_removed, " +
+                        "BOOL_AND(shops.removed) AS shops_removed " +
+                    "FROM products " +
+                    "INNER JOIN shop_products " +
+                        "USING(product_id) " +
+                    "INNER JOIN shops " +
+                        "USING(shop_id) " +
+                    "INNER JOIN product_characteristics " +
+                        "USING(product_id) " +
+                    "WHERE " +
+                        "products.removed = FALSE AND " +
+                        "category_id = ? " +
+                    "GROUP BY product_id " +
+                    getOrderByStatement(query) + ") " +
+                "SELECT product_id " +
+                "FROM id_list " +
+                "WHERE " +
+                    "shop_products_removed = FALSE AND " +
+                    "shops_removed = FALSE";
+
+        return template.queryForList(sql, Long.class, query.getCategoryId());
     }
 
     private String getOrderByStatement(ProductQuery productQuery) {
@@ -131,18 +166,6 @@ public class JdbcCategoryRepository implements  CategoryRepository{
                     converter.getColumnName(productQuery.getSortingOption()) +
                     (productQuery.isOrderDescending() ? " DESC " : " ASC ");
         }
-    }
-
-    private Object[] getQueryParameters(ProductQuery query) {
-        Long[] params = new Long[query.getNumberOfCharacteristics() + 1];
-
-        IntStream
-                .range(0, query.getNumberOfCharacteristics())
-                .forEach(i -> params[i] = query.getCharacteristicsId().get(i));
-
-        params[params.length-1] = query.getCategoryId();
-
-        return  params;
     }
 
     @Override
@@ -160,14 +183,16 @@ public class JdbcCategoryRepository implements  CategoryRepository{
                 "WHERE " +
                     "shop_products.removed = FALSE AND " +
                     "product_id IN(" +
-                        getParametersTemplate(productsId.size()) +
+                        getInsertTemplate(productsId.size()) +
                     ") " +
                 "GROUP BY product_id ";
+
+        Object[] params = productsId.toArray();
 
         return template.query(
                 sql,
                 new BeanPropertyRowMapper<ProductInfo>(ProductInfo.class),
-                productsId.toArray()
+                params.length == 0 ? new Object[] {-1} : params
         );
     }
 
@@ -255,7 +280,8 @@ public class JdbcCategoryRepository implements  CategoryRepository{
         String sql = "SELECT " +
                 "bool_or(category_id = ?) AS present_in_category, " +
                 "shop_id, " +
-                "name " +
+                "name, " +
+                "img_location " +
                 "FROM shops " +
                 "INNER JOIN category_shops " +
                 "USING(shop_id) " +

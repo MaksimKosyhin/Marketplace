@@ -1,6 +1,8 @@
 package com.marketplace.category;
 
 import com.marketplace.repository.category.*;
+import com.marketplace.service.category.CharacteristicMap;
+import com.marketplace.service.category.CharacteristicValue;
 import com.marketplace.service.category.ProductQuery;
 import com.marketplace.service.category.CategoryShop;
 import org.flywaydb.core.Flyway;
@@ -147,14 +149,27 @@ public class JdbcCategoryRepositoryTest {
 
     @Test
     public void returnsProductsId() {
-
         ProductQuery query = new ProductQuery(
                 3,
-                List.of(1L),
+                List.of(new CharacteristicMap(
+                        "name",
+                        List.of(new CharacteristicValue(1L, "value", true)))
+                ),
                 100
         );
 
         assertThat(repository.getProductsId(query)).isEqualTo(List.of(1L, 2L));
+    }
+
+    @Test
+    public void returnsAllProductsId() {
+        ProductQuery query = new ProductQuery(
+                3,
+                List.of(),
+                100
+        );
+
+        assertThat(repository.getAllProductsId(query)).isEqualTo(List.of(1L, 2L));
     }
 
     @Test

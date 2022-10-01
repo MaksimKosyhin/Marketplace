@@ -6,9 +6,13 @@
 <body>
 
 <div>
+    <a th:method="GET" th:href="@{/categories}"> Back to categories</a>
+</div>
+
+<div>
     <form th:method="POST" th:action="@{/categories/shops}" th:object="${shop}" enctype="multipart/form-data">
         <label for="name">Name</label>
-        <input type="text" th:field="*{product.name}" id="name">
+        <input type="text" th:field="*{name}" id="name">
         <br>
         <label for="image">Image</label>
         <input type="file" id="image" name="imgFile" accept="image/*">

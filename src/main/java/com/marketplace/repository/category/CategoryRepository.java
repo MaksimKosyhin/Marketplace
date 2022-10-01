@@ -16,6 +16,8 @@ public interface CategoryRepository {
 
     public List<Long> getProductsId(ProductQuery query);
 
+    public List<Long> getAllProductsId(ProductQuery query);
+
     public List<ProductInfo> getProducts(List<Long> productsId);
 
     public boolean removeCategory(long categoryId);

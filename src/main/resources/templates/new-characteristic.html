@@ -6,8 +6,8 @@
 </head>
 <body>
   <div>
-    <form th:method="POST" th:action="@{/categories/{categoryId}/characteristic(categoryId = ${categoryId})}" th:object="${characteristic}">
-        <input type="hidden" th:field="*{categoryId}" th:value="${categoryId}">
+    <form th:method="POST" th:action="@{/categories/characteristic}" th:object="${characteristic}">
+        <input type="hidden" name="categoryId" th:value="${categoryId}">
         <label for="name">Enter name:</label>
         <input type="text" th:field="*{name}" id="name">
         <br>

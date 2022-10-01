@@ -34,25 +34,65 @@ public class JdbcOrderRepository implements OrderRepository{
 
     @Override
     public List<OrderedProduct> getOrder(long orderId) {
-        String sql = "SELECT " +
-                "order_id, " +
-                "products.product_id AS product_id, " +
-                "shops.shop_id AS shop_id, " +
-                "products.name AS product_name, " +
-                "products.img_location AS product_img_location, " +
-                "amount, " +
-                "price, " +
-                "shops.name AS shop_name, " +
-                "shops.img_location AS shop_img_location " +
-                "FROM products " +
-                "INNER JOIN shop_products " +
-                "USING(product_id) " +
-                "INNER JOIN shops " +
-                "USING(shop_id)" +
-                "INNER JOIN order_shop_products " +
-                "USING(product_id) " +
-                "WHERE " +
-                "order_id = ?";
+//        String sql = "SELECT " +
+//                "order_id, " +
+//                "products.product_id AS product_id, " +
+//                "shops.shop_id AS shop_id, " +
+//                "products.name AS product_name, " +
+//                "products.img_location AS product_img_location, " +
+//                "amount, " +
+//                "sp1.price, " +
+//                "shops.name AS shop_name, " +
+//                "shops.img_location AS shop_img_location " +
+//                "FROM order_shop_products " +
+//                "INNER JOIN products " +
+//                "USING(product_id) " +
+//                "INNER JOIN shops " +
+//                "USING(shop_id)" +
+//                "INNER JOIN shop_products AS sp1 " +
+//                "ON(products.product_id = sp1.product_id) " +
+//                "INNER JOIN shop_products AS sp2 " +
+//                "ON(shops.shop_id = sp2.shop_id) " +
+//                "WHERE " +
+//                "order_id = ?";
+
+
+        String sql = "WITH ordered_products AS " +
+                    "(SELECT " +
+                        "order_id, " +
+                        "products.product_id AS product_id, " +
+                        "shops.shop_id AS shop_id, " +
+                        "products.name AS product_name, " +
+                        "products.img_location AS product_img_location, " +
+                        "amount, " +
+                        "shops.name AS shop_name, " +
+                        "shops.img_location AS shop_img_location " +
+                    "FROM order_shop_products " +
+                    "INNER JOIN products " +
+                        "USING(product_id) " +
+                    "INNER JOIN shops " +
+                        "USING(shop_id) " +
+                    "WHERE " +
+                        "order_id = ?) " +
+                "SELECT " +
+                    "order_id, " +
+                    "ordered_products.product_id, " +
+                    "ordered_products.shop_id, " +
+                    "product_name, " +
+                    "product_img_location, " +
+                    "amount, " +
+                    "shop_name, " +
+                    "shop_img_location, " +
+                    "sp1.price AS price " +
+                "FROM ordered_products " +
+                "INNER JOIN shop_products AS sp1 " +
+                "ON(ordered_products.shop_id = sp1.shop_id) " +
+                "INNER JOIN shop_products AS sp2 " +
+                "ON(ordered_products.product_id = sp2.product_id) ";
+
+//        String sql = "WITH order_products AS " +
+//                "(SELECT " +
+//                ")"
 
         return jdbcTemplate.query(
                 sql,

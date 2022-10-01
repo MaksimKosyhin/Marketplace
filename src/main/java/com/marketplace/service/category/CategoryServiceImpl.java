@@ -124,7 +124,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public ProductQuery getProductQuery(long categoryId, int size) {
-        return new ProductQuery(categoryId, getCharacteristicsId(categoryId), size);
+        return new ProductQuery(categoryId, getCharacteristics(categoryId), size);
     }
 
     @Override
@@ -134,7 +134,11 @@ public class CategoryServiceImpl implements CategoryService {
         int page = 1;
         pages.put(page, new ArrayList<>());
 
-        for(Long id: repository.getProductsId(query)) {
+        List<Long> idList = query.getCharacteristics().size() == 0 ?
+                repository.getAllProductsId(query) :
+                repository.getProductsId(query);
+
+        for(Long id: idList) {
             if(pages.get(page).size() == query.getSize()) {
                 pages.put(++page, new ArrayList<>());
             } else {
@@ -177,10 +181,8 @@ public class CategoryServiceImpl implements CategoryService {
         CharacteristicMap result = new CharacteristicMap(entry.getKey());
 
         for (Characteristic c : entry.getValue()) {
-            result.getValues().put(
-                    c.getCharacteristicId(),
-                    c.getCharacteristicValue()
-            );
+            result.getValues().add(
+                    new CharacteristicValue(c.getCharacteristicId(), c.getCharacteristicValue()));
         }
 
         return result;

@@ -139,8 +139,8 @@ class CategoryServiceImplTest {
 
         given(categoryRepository.getCharacteristics(categoryId)).willReturn(List.of(db1, db2, db3));
 
-        CharacteristicMap c1 = new CharacteristicMap("name1", Map.of(1L, "val1", 2L, "val2"));
-        CharacteristicMap c2 = new CharacteristicMap("name2", Map.of(3L, "val3"));
+        CharacteristicMap c1 = new CharacteristicMap("name1");
+        CharacteristicMap c2 = new CharacteristicMap("name2");
 
         //then
         assertThat(categoryService.getCharacteristics(categoryId)).isEqualTo(List.of(c2, c1));

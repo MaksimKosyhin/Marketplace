@@ -2,8 +2,8 @@ package com.marketplace.service.category;
 
 import lombok.*;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 @NoArgsConstructor
 @Getter
@@ -13,15 +13,15 @@ import java.util.Map;
 public class CharacteristicMap {
 
     private String name;
-    private Map<Long, String> values;
+    private List<CharacteristicValue> values;
 
     public CharacteristicMap(String name) {
         this.name = name;
-        values = new HashMap<>();
+        values = new ArrayList<>();
     }
 
-    public CharacteristicMap(String name, Map<Long, String> values) {
+    public CharacteristicMap(String name, List<CharacteristicValue> values) {
         this.name = name;
-        this.values = new HashMap<>(values);
+        this.values = values;
     }
 }

@@ -46,6 +46,8 @@ public class CategoryController {
 
     @PostMapping
     public String addCategory(@ModelAttribute CategoryInfo category) {
+        System.out.println(category);
+
         service.addCategory(category);
         return "redirect:/categories/" + category.getParentId();
     }
@@ -62,25 +64,28 @@ public class CategoryController {
                               @ModelAttribute ProductList list,
                               Model model) {
 
-        if (query == null && list != null) {
+        if (query.isEmpty() && !list.isEmpty()) {
             model.addAttribute("products", service.getProducts(list.getProductsId()));
             model.addAttribute("list", list);
-        } else if (query != null && list == null) {
+        } else if (!query.isEmpty() && list.isEmpty()) {
             ProductList newList = service.getProductList(query);
             model.addAttribute("products", service.getProducts(newList.getProductsId()));
             model.addAttribute("list", newList);
-        } else if(query == null && list == null){
+        } else if(query.isEmpty() && list.isEmpty()){
             ProductQuery newQuery = service.getProductQuery(categoryId, NUMBER_OF_ENTRIES);
             ProductList newList = service.getProductList(newQuery);
+
+            System.out.println(newQuery);
+            System.out.println(newList);
+
             model.addAttribute("products", service.getProducts(newList.getProductsId()));
             model.addAttribute("list", newList);
         } else {
             throw new RequestException("wrong request parameters");
         }
 
-        model.addAttribute("query", new ProductQuery());
-        model.addAttribute("characteristics", service.getCharacteristics(query.getCategoryId()));
-        model.addAttribute("options", SortingOption.values());
+        model.addAttribute("categoryId", categoryId);
+        model.addAttribute("query", new ProductQuery(categoryId, service.getCharacteristics(query.getCategoryId()), NUMBER_OF_ENTRIES));
 
         return "products";
     }
@@ -97,6 +102,8 @@ public class CategoryController {
 
     @PostMapping("shops")
     public String addShopsToCategory(@ModelAttribute CategoryShops categoryShops) {
+        System.out.println(categoryShops);
+
         service.addShopsToCategory(categoryShops);
         return "redirect:/categories";
     }
@@ -110,6 +117,8 @@ public class CategoryController {
 
     @PostMapping("characteristic")
     public String addCharacteristic(@ModelAttribute Characteristic characteristic) {
+        System.out.println(characteristic);
+
         service.addCharacteristic(characteristic);
         return "redirect:/categories/" + characteristic.getCategoryId();
     }

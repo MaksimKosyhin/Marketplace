@@ -34,17 +34,11 @@ public class ProductController {
         model.addAttribute("product", info);
 
         return "new-product";
-
-//        model.addAttribute("categoryId", categoryId);
-//        model.addAttribute("product", new ProductInfo());
-//        model.addAttribute("characteristics", service.getCategoryCharacteristic(categoryId));
-//
-//        return "new-product";
     }
 
     @PostMapping()
-    public String addProduct(
-            @ModelAttribute ProductInfo product) {
+    public String addProduct(@ModelAttribute ProductInfo product) {
+        System.out.println(product);
 
         long productId = service.addProduct(product);
 
@@ -68,7 +62,9 @@ public class ProductController {
     }
 
     @PostMapping("shop-products")
-    public String addShop(@ModelAttribute ShopProductInfo shopProduct) {
+    public String addShopProduct(@ModelAttribute ShopProductInfo shopProduct) {
+        System.out.println(shopProduct);
+
         service.addShopProduct(shopProduct);
 
         return "redirect:/products/" + shopProduct.getProductId();

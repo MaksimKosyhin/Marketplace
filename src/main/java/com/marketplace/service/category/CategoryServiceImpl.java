@@ -6,9 +6,8 @@ import com.marketplace.config.exception.ModifyingEntryException;
 import com.marketplace.config.exception.NonExistingEntityException;
 import com.marketplace.config.exception.ParentCategoryException;
 import com.marketplace.controller.category.CategoryInfo;
-import com.marketplace.controller.category.CategoryShops;
+import com.marketplace.controller.category.CategoryShopList;
 import com.marketplace.controller.category.ProductList;
-import com.marketplace.controller.shop.ShopInfo;
 import com.marketplace.repository.category.*;
 import com.marketplace.util.CategoryMapper;
 import org.springframework.transaction.annotation.Transactional;
@@ -87,12 +86,12 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
-    public void addShopsToCategory(CategoryShops shops) {
+    public void addShopsToCategory(CategoryShopList shops) {
         if (isParentCategory(shops.getCategoryId())) {
             throw new AddEntryException("Cannot add shops to parent category");
         }
 
-        for(CategoryShop shop: shops.getShops()) {
+        for(CategoryShop shop: shops.getValues()) {
             if(shop.isPresentInCategory()) {
                 if (!repository.addShopToCategory(shop.getShopId(), shop.getShopId())) {
                     throw new AddEntryException("shop was not added to category");

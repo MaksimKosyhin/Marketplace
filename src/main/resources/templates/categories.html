@@ -29,13 +29,13 @@
     </form>
 </div>
 
+<br>
 
 <div>
     <a th:method="GET" th:href="@{/categories/{parentId}/new(parentId = ${categoryId})}">Add subcategory</a>
     <br>
-    <a th:method="GET" th:href="@{/categories/{categoryId}/shops(categoryId = ${categoryId})}">Add shop to category</a>
-    <br>
     <a th:mathod="GET" th:href="@{/shops}"> Add new shops</a>
+    <br>
 </div>
 
 <div>

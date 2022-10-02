@@ -6,15 +6,14 @@
 </head>
 <body>
     <div>
-        <a th:method="GET" th:href="@{/categories/{categoryId}/characteristic(categoryId = ${categoryId})}">
-            Add characteristic
-        </a>
-
+        <a th:method="GET" th:href="@{/categories/{categoryId}/characteristic(categoryId = ${categoryId})}">Add characteristic</a>
         <br>
 
-        <a th:method="GET" th:href="@{/products/{categoryId}/new(categoryId = ${categoryId})}">
-            Add new product
-        </a>
+        <a th:method="GET" th:href="@{/products/{categoryId}/new(categoryId = ${categoryId})}">Add new product</a>
+        <br>
+
+        <a th:method="GET" th:href="@{/categories/{categoryId}/shops(categoryId = ${categoryId})}">Add shop to category</a>
+        <br>
     </div>
 
     <div>

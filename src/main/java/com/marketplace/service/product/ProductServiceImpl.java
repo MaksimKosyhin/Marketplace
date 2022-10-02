@@ -4,12 +4,11 @@ import com.marketplace.config.ImageLoader;
 import com.marketplace.config.exception.AddEntryException;
 import com.marketplace.config.exception.ModifyingEntryException;
 import com.marketplace.config.exception.NonExistingEntityException;
-import com.marketplace.controller.product.ProductInfo;
+import com.marketplace.controller.product.ProductForm;
 import com.marketplace.repository.product.Product;
 import com.marketplace.repository.product.ProductCharacteristic;
 import com.marketplace.repository.product.ProductRepository;
 import com.marketplace.repository.product.Shop;
-import com.marketplace.service.category.CategoryShop;
 import com.marketplace.util.ProductMapper;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,7 +57,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Transactional
     @Override
-    public long addProduct(ProductInfo info) {
+    public long addProduct(ProductForm info) {
         Product product = mapper.toProduct(info);
         product.setImgLocation(imageLoader.save(info.getImgFile(), "product", info.getName()));
 
@@ -75,7 +74,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductCharacteristicMap> getCategoryCharacteristic(long categoryId) {
+    public List<ProductCharacteristicMap> getCategoryCharacteristics(long categoryId) {
         return repository.getCategoryCharacteristics(categoryId)
                 .stream()
                 .collect(
@@ -86,11 +85,6 @@ public class ProductServiceImpl implements ProductService {
                 );
     }
 
-    @Override
-    public List<Shop> getShops() {
-        return repository.getShops();
-    }
-
     private List<ProductCharacteristicMap> mapValues(Map<String, List<ProductCharacteristic>> map) {
         List<ProductCharacteristicMap> characteristics = new ArrayList<>();
 
@@ -99,6 +93,11 @@ public class ProductServiceImpl implements ProductService {
         }
 
         return characteristics;
+    }
+
+    @Override
+    public List<Shop> getShops() {
+        return repository.getShops();
     }
 
     @Override

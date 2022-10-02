@@ -11,7 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
-public class CategoryShops {
+public class CategoryShopList {
     private long categoryId;
-    private List<CategoryShop> shops;
+    private List<CategoryShop> values;
 }

@@ -2,9 +2,8 @@ package com.marketplace.product;
 
 import com.marketplace.config.ImageLoader;
 import com.marketplace.repository.product.Product;
-import com.marketplace.repository.product.ProductCharacteristic;
 import com.marketplace.repository.product.ProductRepository;
-import com.marketplace.controller.product.ProductInfo;
+import com.marketplace.controller.product.ProductForm;
 import com.marketplace.service.product.ProductServiceImpl;
 import com.marketplace.util.ProductMapper;
 import org.junit.jupiter.api.Test;
@@ -60,7 +59,7 @@ public class ProductServiceImplTest {
     @Test
     public void addsProduct() {
         //given
-        ProductInfo productinfo = new ProductInfo(
+        ProductForm productinfo = new ProductForm(
                 1,
                 "test",
                 new MockMultipartFile("test", new byte[] {}),
@@ -70,7 +69,7 @@ public class ProductServiceImplTest {
         List<Long> characteristicsId = List.of(1L, 2L, 3L);
 
         given(repository.addProduct(any())).willReturn(1L);
-        given(mapper.toProduct(any(ProductInfo.class))).willReturn(new Product());
+        given(mapper.toProduct(any(ProductForm.class))).willReturn(new Product());
 
         //when
         service.addProduct(productinfo);

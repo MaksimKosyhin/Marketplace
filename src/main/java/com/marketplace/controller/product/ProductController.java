@@ -1,13 +1,10 @@
 package com.marketplace.controller.product;
 
-import com.marketplace.service.product.ProductCharacteristicMap;
 import com.marketplace.service.product.ProductService;
 import com.marketplace.service.product.ShopProductInfo;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Controller
 @RequestMapping("products")
@@ -26,20 +23,27 @@ public class ProductController {
 
     @GetMapping("{categoryId}/new")
     public String addProduct(@PathVariable long categoryId, Model model) {
-        model.addAttribute("categoryId", categoryId);
-        model.addAttribute("characteristics", service.getCategoryCharacteristic(categoryId));
-        model.addAttribute("product", new ProductInfo());
+        model.addAttribute("product",
+                new ProductForm(categoryId, service.getCategoryCharacteristics(categoryId)));
 
         return "new-product";
     }
 
+//    @PostMapping()
+//    public String addProduct(@ModelAttribute ProductInfo product) {
+//        System.out.println(product);
+//
+//        long productId = service.addProduct(product);
+//
+//        return "redirect:/products/" + productId;
+//    }
+
     @PostMapping()
-    public String addProduct(@ModelAttribute ProductInfo info) {
-        System.out.println(info);
+    public String addProduct(@ModelAttribute ProductForm product) {
+        System.out.println(product);
 
-        long productId = service.addProduct(info);
 
-        return "redirect:/products/" + productId;
+        return "redirect:/categories";
     }
 
     @PutMapping("{productId}")

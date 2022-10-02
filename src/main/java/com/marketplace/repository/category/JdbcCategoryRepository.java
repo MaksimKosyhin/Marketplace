@@ -278,12 +278,12 @@ public class JdbcCategoryRepository implements  CategoryRepository{
     @Override
     public List<CategoryShop> getShops(long categoryId) {
         String sql = "SELECT " +
-                "bool_or(category_id = ?) AS present_in_category, " +
+                "COALESCE(bool_or(category_id = ?), FALSE) AS present_in_category, " +
                 "shop_id, " +
                 "name, " +
                 "img_location " +
                 "FROM shops " +
-                "INNER JOIN category_shops " +
+                "LEFT JOIN category_shops " +
                 "USING(shop_id) " +
                 "WHERE removed = FALSE " +
                 "GROUP BY shop_id ";

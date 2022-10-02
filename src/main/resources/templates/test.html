@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Products</title>
+</head>
+<body>
+
+<p>Test Sample</p>
+
+<div>
+    <form th:method="POST" th:action="@{/testing}" th:object="${test}" enctype="multipart/form-data">
+        <div th:each="e1, itemStat: ${test.val}">
+            <input hidden th:name="|val[${itemStat.index}].name|" th:value="${e1.name}">
+        </div>
+
+        <input type="submit" value="Add">
+    </form>
+</div>
+
+</body>
+</html>

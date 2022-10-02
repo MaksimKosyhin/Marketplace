@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -46,8 +47,6 @@ public class CategoryController {
 
     @PostMapping
     public String addCategory(@ModelAttribute CategoryInfo category) {
-        System.out.println(category);
-
         service.addCategory(category);
         return "redirect:/categories/" + category.getParentId();
     }
@@ -106,19 +105,21 @@ public class CategoryController {
 
         Map<Boolean,List<CategoryShop>> shops = service.getShops(categoryId);
 
+        System.out.println(shops);
+
         model.addAttribute("included", shops.get(true));
         model.addAttribute("notIncluded", shops.get(false));
         model.addAttribute("categoryId", categoryId);
-        model.addAttribute("categoryShops", new CategoryShops());
+        model.addAttribute("shops", new CategoryShopList());
         return "category-shops";
     }
 
     @PostMapping("shops")
-    public String addShopsToCategory(@ModelAttribute CategoryShops categoryShops) {
-        System.out.println(categoryShops);
+    public String addShopsToCategory(@ModelAttribute CategoryShopList shops) {
+        System.out.println(shops);
 
-        service.addShopsToCategory(categoryShops);
-        return "redirect:/categories";
+        service.addShopsToCategory(shops);
+        return "redirect:/categories/" + shops.getCategoryId();
     }
 
     @GetMapping("{categoryId}/characteristic")

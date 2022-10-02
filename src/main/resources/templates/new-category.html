@@ -8,7 +8,7 @@
 <div>
     <form th:method="POST" th:action="@{/categories}" th:object="${category}" enctype="multipart/form-data">
         <input type="hidden" name="parentId" th:value="${parentId}">
-        <label for="name">Enter name:</label>
+        <label for="name">Name</label>
         <input type="text" th:field="*{name}" id="name">
         <br>
         <label for="image">Image</label>

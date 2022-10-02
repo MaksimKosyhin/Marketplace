@@ -8,26 +8,28 @@
 
 <div>
     <form th:method="POST" th:action="@{/products}" th:object="${product}" enctype="multipart/form-data">
-        <label for="name">Name: </label>
+        <input type="hidden" name="categoryId" th:value="${categoryId}">
+
+        <label for="name">Name</label>
         <input type="text" th:field="*{name}" id="name">
         <br>
         <label for="image">Image</label>
         <input type="file" id="image" name="imgFile" accept="image/*">
 
-        <div th:each="characteristic: ${characteristics}">
+        <div th:each="characteristic, charStat: ${characteristics}">
             <p th:text="${characteristic.name}"></p>
 
-            <div th:each="details: ${characteristic.values}">
-                <input type="checkbox" th:id="${details.value}" name="includedCharacteristic" th:value="${details.key}">
+            <div th:each="details, detStat: ${characteristic.values}">
+                <input type="checkbox" th:id="${details.value}"
+                       th:name="|characteristics[__${charStat.index}__][__${detStat.index}__].includedCharacteristic|"
+                       th:value="${details.key}">
+
                 <label th:for="${details.value}" th:text="${details.value}"></label>
             </div>
 
         </div>
 
-        <input type="hidden" name="categoryId" th:value="${categoryId}">
-        <input type="hidden" name="characteristics" th:value="${characteristics}">
-
-        <input type="submit" value="Send">
+        <input type="submit" value="Add">
     </form>
 </div>
 

@@ -1,9 +1,8 @@
 package com.marketplace.service.category;
 
 import com.marketplace.controller.category.CategoryInfo;
-import com.marketplace.controller.category.CategoryShops;
+import com.marketplace.controller.category.CategoryShopList;
 import com.marketplace.controller.category.ProductList;
-import com.marketplace.controller.shop.ShopInfo;
 import com.marketplace.repository.category.Category;
 import com.marketplace.repository.category.Characteristic;
 import com.marketplace.repository.category.ProductInfo;
@@ -20,7 +19,7 @@ public interface CategoryService {
 
     public void removeCategory(long categoryId);
 
-    public void addShopsToCategory(CategoryShops shops);
+    public void addShopsToCategory(CategoryShopList shops);
 
     public Map<Boolean, List<CategoryShop>> getShops(long categoryId);
 

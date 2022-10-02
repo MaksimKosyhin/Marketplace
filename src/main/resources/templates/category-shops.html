@@ -1,23 +1,26 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Shops</title>
+    <meta charset="UTF-8">
+    <title>Shops For Category</title>
 </head>
 <body>
 
 <div>
     <p>Included shops</p>
     <p th:each="shop: ${included}" th:text="${shop.name}"></p>
+    <br>
 </div>
 
 <div>
     <p>Shops that can be added</p>
-    <form th:method="POST" th:action="@{/categories/{categoryId}/shops(categoryId = ${categoryShops.categoryId})}" th:object="${categoryShops}">
-        <input type="hidden" name="shops" th:value="${notIncluded}">
+    <form th:method="POST" th:action="@{/categories/shops}" th:object="${shops}">
+        <input type="hidden" name="values" th:value="${notIncluded}">
+        <input type="hidden" name="categoryId" th:value="${categoryId}">
 
         <div th:each="shop: ${notIncluded}">
             <label for="element" th:text="${shop.name}"></label>
-            <input type="checkbox" id="element" th:field="*{shop.presentInCategory}" value="true">
+            <input type="checkbox" id="element" name="presentInCategory" value="true">
         </div>
 
         <input type="submit" value="Add new Shop">

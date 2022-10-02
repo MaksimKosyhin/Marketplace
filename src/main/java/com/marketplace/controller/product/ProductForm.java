@@ -12,9 +12,14 @@ import java.util.List;
 @Setter
 @EqualsAndHashCode
 @ToString
-public class ProductInfo {
+public class ProductForm {
     private long categoryId;
     private String name;
     private MultipartFile imgFile;
     private List<ProductCharacteristicMap> characteristics;
+
+    public ProductForm(long categoryId, List<ProductCharacteristicMap> characteristics) {
+        this.categoryId = categoryId;
+        this.characteristics = characteristics;
+    }
 }

@@ -71,7 +71,8 @@ public class JdbcAppAnalyticsRepository implements  AppAnalyticsRepository{
                 "USING(order_id)" +
                 "WHERE " +
                     "registration_date > ? AND " +
-                    "registration_date < ?  " +
+                    "registration_date < ? AND " +
+                    "parent_category = FALSE " +
                 "GROUP BY category_id";
 
         return template.query(

@@ -26,21 +26,18 @@ public class ProductController {
 
     @GetMapping("{categoryId}/new")
     public String addProduct(@PathVariable long categoryId, Model model) {
-
-        ProductInfo info = new ProductInfo();
-        info.setCategoryId(categoryId);
-        info.setCharacteristics(service.getCategoryCharacteristic(categoryId));
-
-        model.addAttribute("product", info);
+        model.addAttribute("categoryId", categoryId);
+        model.addAttribute("characteristics", service.getCategoryCharacteristic(categoryId));
+        model.addAttribute("product", new ProductInfo());
 
         return "new-product";
     }
 
     @PostMapping()
-    public String addProduct(@ModelAttribute ProductInfo product) {
-        System.out.println(product);
+    public String addProduct(@ModelAttribute ProductInfo info) {
+        System.out.println(info);
 
-        long productId = service.addProduct(product);
+        long productId = service.addProduct(info);
 
         return "redirect:/products/" + productId;
     }

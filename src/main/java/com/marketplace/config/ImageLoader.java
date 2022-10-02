@@ -20,6 +20,8 @@ public class ImageLoader {
 
         fullPath = fullPath.resolve(imgFile.getOriginalFilename());
 
+        System.out.println(fullPath);
+
         try {
             Files.createDirectories(fullPath.getParent());
             Files.write(fullPath, imgFile.getBytes());

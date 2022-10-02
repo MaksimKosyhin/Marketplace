@@ -36,7 +36,7 @@ public class JdbcCategoryRepository implements  CategoryRepository{
 
     @Override
     public boolean isParentCategory(long categoryId) {
-        String sql = "SELECT parent_category " +
+        String sql = "SELECT COALESCE(parent_category, FALSE) " +
                 "FROM categories " +
                 "WHERE category_id = ?";
 

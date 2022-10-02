@@ -26,8 +26,6 @@ public interface CategoryService {
 
     public List<ProductInfo> getProducts(List<Long> productsId);
 
-    public ProductQuery getProductQuery(long categoryId, int size);
-
     public ProductList getProductList(ProductQuery query);
 
     public void addCharacteristic(Characteristic characteristic);

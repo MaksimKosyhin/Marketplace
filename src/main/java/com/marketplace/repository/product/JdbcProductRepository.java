@@ -61,7 +61,7 @@ public class JdbcProductRepository implements  ProductRepository{
     }
 
     @Override
-    public List<CategoryShop> getShops() {
+    public List<Shop> getShops() {
         String sql = "SELECT " +
                     "shop_id, " +
                     "name, " +
@@ -69,7 +69,7 @@ public class JdbcProductRepository implements  ProductRepository{
                 "FROM shops " +
                 "WHERE removed = FALSE";
 
-        return template.query(sql, new BeanPropertyRowMapper<CategoryShop>(CategoryShop.class));
+        return template.query(sql, new BeanPropertyRowMapper<Shop>(Shop.class));
     }
 
     @Override

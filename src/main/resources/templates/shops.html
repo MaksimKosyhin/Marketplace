@@ -10,7 +10,7 @@
 </div>
 
 <div>
-    <form th:method="POST" th:action="@{/categories/shops}" th:object="${shop}" enctype="multipart/form-data">
+    <form th:method="POST" th:action="@{/shops}" th:object="${info}" enctype="multipart/form-data">
         <label for="name">Name</label>
         <input type="text" th:field="*{name}" id="name">
         <br>
@@ -21,11 +21,15 @@
     </form>
 </div>
 
+<br>
+
 <div th:each="shop: ${shops}">
     <img th:src="@{${shop.imgLocation}}" th:alt="${shop.imgLocation}">
+    <br>
     <p th:text="${shop.name}">
-    <form th:method="PUT" th:action="@{/categories/shops/{shopId}(shopId = ${shop.shopId})">
-        <input type="submit" value="logout"/>
+    <br>
+    <form th:method="PUT" th:action="@{/shops/{shopId}(shopId = ${shop.shopId})}">
+        <input type="submit" value="Remove"/>
     </form>
 </div>
 

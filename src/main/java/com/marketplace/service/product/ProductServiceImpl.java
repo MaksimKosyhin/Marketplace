@@ -8,6 +8,7 @@ import com.marketplace.controller.product.ProductInfo;
 import com.marketplace.repository.product.Product;
 import com.marketplace.repository.product.ProductCharacteristic;
 import com.marketplace.repository.product.ProductRepository;
+import com.marketplace.repository.product.Shop;
 import com.marketplace.service.category.CategoryShop;
 import com.marketplace.util.ProductMapper;
 import org.springframework.transaction.annotation.Transactional;
@@ -86,7 +87,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<CategoryShop> getShops() {
+    public List<Shop> getShops() {
         return repository.getShops();
     }
 

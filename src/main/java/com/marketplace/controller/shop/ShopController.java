@@ -17,6 +17,7 @@ public class ShopController {
     @GetMapping
     public String getShops(Model model) {
         model.addAttribute("shops", service.getShops());
+        model.addAttribute("info", new ShopInfo());
         return "shops";
     }
 
@@ -31,6 +32,6 @@ public class ShopController {
     public String removeShop(@PathVariable long shopId) {
         service.removeShop(shopId);
 
-        return "redirect:/categories";
+        return "redirect:/shops";
     }
 }

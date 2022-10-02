@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Products</title>
+</head>
+<body>
+
+<div>
+    <form th:method="POST" th:action="@{/shop-products}" th:object="${shopProduct}">
+
+        <input type="hidden" name="productId" th:value="${productId}">
+
+        <p>Select Shop</p>
+
+        <div th:each="shop: ${shops}">
+            <label th:for="${shop.name}"></label>
+            <input type="radio" th:field="*{shopId}" th:value="${shop.shopId}" th:id="${shop.name}">
+            <br>
+        </div>
+
+        <label for="link">Link to shop's page </label>
+        <input type="text" th:field="*{link}" id="link">
+        <br>
+
+        <label for="score">Score</label>
+        <input type="number" id="score" th:field="*{score}">
+        <br>
+
+        <label for="price">Price</label>
+        <input type="number" id="price" th:field="*{price}">
+        <br>
+
+        <label for="reviews">Reviews</label>
+        <input type="number" id="reviews" th:field="*{reviews}">
+        <br>
+
+        <input type="submit" value="Add">
+    </form>
+</div>
+
+</body>
+</html>

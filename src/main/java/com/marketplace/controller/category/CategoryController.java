@@ -64,19 +64,30 @@ public class CategoryController {
                               @ModelAttribute ProductList list,
                               Model model) {
 
+        System.out.println(query);
+        System.out.println(list);
+
         if (query.isEmpty() && !list.isEmpty()) {
+
+//            System.out.println("cccccccccccccccccccccccccccccccccccc");
+
             model.addAttribute("products", service.getProducts(list.getProductsId()));
             model.addAttribute("list", list);
         } else if (!query.isEmpty() && list.isEmpty()) {
+
+//            System.out.println("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");
+
             ProductList newList = service.getProductList(query);
             model.addAttribute("products", service.getProducts(newList.getProductsId()));
             model.addAttribute("list", newList);
         } else if(query.isEmpty() && list.isEmpty()){
-            ProductQuery newQuery = service.getProductQuery(categoryId, NUMBER_OF_ENTRIES);
+//            System.out.println("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+
+            ProductQuery newQuery = new ProductQuery(categoryId, List.of(), NUMBER_OF_ENTRIES);
             ProductList newList = service.getProductList(newQuery);
 
-            System.out.println(newQuery);
-            System.out.println(newList);
+//            System.out.println(newQuery);
+//            System.out.println(newList);
 
             model.addAttribute("products", service.getProducts(newList.getProductsId()));
             model.addAttribute("list", newList);
@@ -96,8 +107,10 @@ public class CategoryController {
         Map<Boolean,List<CategoryShop>> shops = service.getShops(categoryId);
 
         model.addAttribute("included", shops.get(true));
-        model.addAttribute("categoryShops", new CategoryShops(categoryId, shops.get(false)));
-        return "shops";
+        model.addAttribute("notIncluded", shops.get(false));
+        model.addAttribute("categoryId", categoryId);
+        model.addAttribute("categoryShops", new CategoryShops());
+        return "category-shops";
     }
 
     @PostMapping("shops")

@@ -24,9 +24,10 @@
 
             <div th:each="characteristic: ${query.characteristics}">
                 <p th:text="${characteristic.name}"></p>
-                <div th:each="element: ${characteristic.value}">
+
+                <div th:each="element: ${characteristic.values}">
                     <label th:for="${element.value}" th:text="${element.value}"></label>
-                    <input type="checkbox" th:id="${element.value}" th:field="*{enabled}" th:value="${true}">
+                    <input type="checkbox" th:id="${element.value}" name="enabled" th:value="${true}">
                 </div>
             </div>
 

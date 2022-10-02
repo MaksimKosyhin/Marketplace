@@ -9,20 +9,23 @@
 <div>
     <form th:method="POST" th:action="@{/products}" th:object="${product}" enctype="multipart/form-data">
         <label for="name">Name: </label>
-        <input type="text" th:field="*{product.name}" id="name">
+        <input type="text" th:field="*{name}" id="name">
         <br>
         <label for="image">Image</label>
         <input type="file" id="image" name="imgFile" accept="image/*">
 
-        <div th:each="characteristic: ${product.characteristics}">
+        <div th:each="characteristic: ${characteristics}">
             <p th:text="${characteristic.name}"></p>
 
             <div th:each="details: ${characteristic.values}">
-                <input type="radio" th:id="${details.value}" th:field="*{characteristic.includedCharacteristic}" th:value="${details.key}">
+                <input type="checkbox" th:id="${details.value}" name="includedCharacteristic" th:value="${details.key}">
                 <label th:for="${details.value}" th:text="${details.value}"></label>
             </div>
 
         </div>
+
+        <input type="hidden" name="categoryId" th:value="${categoryId}">
+        <input type="hidden" name="characteristics" th:value="${characteristics}">
 
         <input type="submit" value="Send">
     </form>

@@ -12,8 +12,10 @@
 
 <div>
     <p>Shops that can be added</p>
-    <form th:method="POST" th:action="@{/categories/{categoryId}/shops(categoryId = ${categoryShops.categoryId})" th:object="${categoryShops}">
-        <div th:each="shop: ${categoryShops.shops}">
+    <form th:method="POST" th:action="@{/categories/{categoryId}/shops(categoryId = ${categoryShops.categoryId})}" th:object="${categoryShops}">
+        <input type="hidden" name="shops" th:value="${notIncluded}">
+
+        <div th:each="shop: ${notIncluded}">
             <label for="element" th:text="${shop.name}"></label>
             <input type="checkbox" id="element" th:field="*{shop.presentInCategory}" value="true">
         </div>

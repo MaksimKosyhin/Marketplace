@@ -12,7 +12,7 @@ public interface ProductRepository {
 
     public Product getProduct(long productId);
 
-    public List<CategoryShop> getShops();
+    public List<Shop> getShops();
 
     public List<ShopProduct> getShopProducts(long productId);
 

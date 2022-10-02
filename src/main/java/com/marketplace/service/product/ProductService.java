@@ -1,6 +1,7 @@
 package com.marketplace.service.product;
 
 import com.marketplace.controller.product.ProductInfo;
+import com.marketplace.repository.product.Shop;
 import com.marketplace.service.category.CategoryShop;
 
 import java.util.List;
@@ -15,7 +16,7 @@ public interface ProductService {
 
     public List<ProductCharacteristicMap> getCategoryCharacteristic(long categoryId);
 
-    public List<CategoryShop> getShops();
+    public List<Shop> getShops();
 
     public void removeProduct(long productId);
 

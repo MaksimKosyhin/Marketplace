@@ -123,11 +123,6 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public ProductQuery getProductQuery(long categoryId, int size) {
-        return new ProductQuery(categoryId, getCharacteristics(categoryId), size);
-    }
-
-    @Override
     public ProductList getProductList(ProductQuery query) {
         Map<Integer, List<Long>> pages = new HashMap<>();
 

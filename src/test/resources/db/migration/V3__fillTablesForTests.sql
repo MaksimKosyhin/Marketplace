@@ -58,10 +58,10 @@ INSERT INTO orders(user_id, registration_date) VALUES(1, '2020-11-13');
 INSERT INTO orders(user_id, registration_date) VALUES(2, '2021-04-30');
 
 INSERT INTO order_shop_products(order_id, shop_id, product_id, amount) VALUES (1, 1, 1, 12);
-INSERT INTO order_shop_products(order_id, shop_id, product_id, amount) VALUES (1, 1, 2, 3);
-INSERT INTO order_shop_products(order_id, shop_id, product_id, amount) VALUES (1, 2, 3, 4);
-
-INSERT INTO order_shop_products(order_id, shop_id, product_id, amount) VALUES (2, 2, 1, 6);
-INSERT INTO order_shop_products(order_id, shop_id, product_id, amount) VALUES (2, 3, 2, 5);
-
-INSERT INTO order_shop_products(order_id, shop_id, product_id, amount) VALUES (3, 1, 1, 10);
+--INSERT INTO order_shop_products(order_id, shop_id, product_id, amount) VALUES (1, 1, 2, 3);
+--INSERT INTO order_shop_products(order_id, shop_id, product_id, amount) VALUES (1, 2, 3, 4);
+--
+--INSERT INTO order_shop_products(order_id, shop_id, product_id, amount) VALUES (2, 2, 1, 6);
+--INSERT INTO order_shop_products(order_id, shop_id, product_id, amount) VALUES (2, 3, 2, 5);
+--
+--INSERT INTO order_shop_products(order_id, shop_id, product_id, amount) VALUES (3, 1, 1, 10);

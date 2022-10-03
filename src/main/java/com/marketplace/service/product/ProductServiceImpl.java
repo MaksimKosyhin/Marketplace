@@ -4,6 +4,7 @@ import com.marketplace.config.ImageLoader;
 import com.marketplace.config.exception.AddEntryException;
 import com.marketplace.config.exception.ModifyingEntryException;
 import com.marketplace.config.exception.NonExistingEntityException;
+import com.marketplace.controller.product.ProductCharacteristicMap;
 import com.marketplace.controller.product.ProductForm;
 import com.marketplace.repository.product.Product;
 import com.marketplace.repository.product.ProductCharacteristic;

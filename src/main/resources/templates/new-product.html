@@ -16,15 +16,27 @@
         <label for="image">Image</label>
         <input type="file" id="image" name="imgFile" accept="image/*">
 
-        <div th:each="characteristic, charStat: ${characteristics}">
+        <div th:each="characteristic, charStat: ${product.characteristics}">
             <p th:text="${characteristic.name}"></p>
 
-            <div th:each="details, detStat: ${characteristic.values}">
-                <input type="checkbox" th:id="${details.value}"
-                       th:name="|characteristics[__${charStat.index}__][__${detStat.index}__].includedCharacteristic|"
-                       th:value="${details.key}">
+            <div th:each="option, detStat: ${characteristic.options}">
+<!--                <input hidden-->
+<!--                       th:name="|__characteristics[__${charStat.index}__].options__[__${detStat.index}__].name|"-->
+<!--                       th:value="${option.name}">-->
 
-                <label th:for="${details.value}" th:text="${details.value}"></label>
+<!--                <input hidden-->
+<!--                       th:name="|__characteristics[__${charStat.index}__].options__[__${detStat.index}__].characteristicId|"-->
+<!--                       th:value="${option.characteristicId}">-->
+
+<!--                <input hidden-->
+<!--                       th:name="|__characteristics[__${charStat.index}__].options__[__${detStat.index}__]|"-->
+<!--                       th:value="${option}">-->
+
+                <input type="checkbox" th:id="${option.name}"
+                       th:name="|characteristics[__${charStat.index}__].includedCharacteristic|"
+                       th:value="${option.characteristicId}">
+
+                <label th:for="${option.name}" th:text="${option.name}"></label>
             </div>
 
         </div>

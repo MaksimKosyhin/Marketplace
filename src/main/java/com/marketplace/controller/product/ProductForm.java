@@ -1,6 +1,5 @@
 package com.marketplace.controller.product;
 
-import com.marketplace.service.product.ProductCharacteristicMap;
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 

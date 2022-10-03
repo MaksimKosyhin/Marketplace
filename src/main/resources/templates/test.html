@@ -10,8 +10,16 @@
 
 <div>
     <form th:method="POST" th:action="@{/testing}" th:object="${test}" enctype="multipart/form-data">
-        <div th:each="e1, itemStat: ${test.val}">
-            <input hidden th:name="|val[${itemStat.index}].name|" th:value="${e1.name}">
+        <div th:each="e1, item1Stat: ${test.val}">
+            <div th:each="e2, item2Stat: ${e1.elements}">
+                <input hidden th:name="|__val[__${item1Stat.index}__].elements__[__${item2Stat.index}__]|" th:value="${e2}">
+
+                <input type="radio" th:id="${e2}"
+                       th:name="|val[__${item1Stat.index}__].chosen|"
+                       th:value="${e2}">
+
+                <label th:for="${e2}" th:text="${e2}"></label>
+            </div>
         </div>
 
         <input type="submit" value="Add">

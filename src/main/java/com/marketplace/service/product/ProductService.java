@@ -1,5 +1,6 @@
 package com.marketplace.service.product;
 
+import com.marketplace.controller.product.ProductCharacteristicMap;
 import com.marketplace.controller.product.ProductForm;
 import com.marketplace.repository.product.Shop;
 

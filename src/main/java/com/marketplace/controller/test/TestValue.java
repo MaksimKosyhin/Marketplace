@@ -25,5 +25,6 @@ import java.util.Map;
 @EqualsAndHashCode
 @ToString
 public class TestValue {
-    private String name;
+    private List<String> elements;
+    private String chosen;
 }

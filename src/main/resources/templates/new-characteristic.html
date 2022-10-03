@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>New Characteristic</title>
+</head>
+<body>
+  <div>
+    <form th:method="POST" th:action="@{/categories/characteristic}" th:object="${characteristic}">
+        <input type="hidden" name="categoryId" th:value="${categoryId}">
+        <label for="name">Enter name:</label>
+        <input type="text" th:field="*{name}" id="name">
+        <br>
+        <label for="value">Enter value:</label>
+        <input type="text" th:field="*{characteristicValue}" id="value">
+        <br>
+        <input type="submit" value="Add"/>
+    </form>
+  </div>
+</body>
+</html>

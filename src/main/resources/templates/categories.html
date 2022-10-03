@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Categories</title>
+</head>
+<body>
+
+<div sec:authorize="isAnonymous()">
+    <table>
+        <tr>
+            <td>
+                <form th:method="GET" th:action="@{/users/login}">
+                    <input type="submit" value="login"/>
+                </form>
+            </td>
+
+            <td>
+                <form th:method="GET" th:action="@{/users/register}">
+                    <input type="submit" value="register"/>
+                </form>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<div sec:authorize="isAuthenticated()">
+    <form th:method="GET" th:action="@{/logout}">
+        <input type="submit" value="logout"/>
+    </form>
+</div>
+
+<br>
+
+<div>
+    <a th:method="GET" th:href="@{/categories/{parentId}/new(parentId = ${categoryId})}">Add subcategory</a>
+    <br>
+    <a th:mathod="GET" th:href="@{/shops}"> Add new shops</a>
+    <br>
+</div>
+
+<div>
+    <ul>
+        <li th:each = "category : ${categories}">
+            <img th:src="@{${category.imgLocation}}" th:alt="${category.imgLocation}">
+            <br>
+            <a th:method="GET" th:text="${category.name}" th:href="@{/categories/{categoryId}(categoryId=${category.categoryId})}"></a>
+            <br>
+            <form th:method="PUT" th:action="@{/categories/{categoryId}(categoryId=${category.categoryId})}">
+                <input type="submit" value="Remove"/>
+            </form>
+        </li>
+    </ul>
+</div>
+
+</body>
+</html>

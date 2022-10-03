@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Products</title>
+</head>
+<body>
+
+<div>
+    <div>
+        <img th:src="@{${product.imgLocation}}" th:alt="${product.imgLocation}">
+        <p th:text="${product.name}"></p>
+    </div>
+
+    <div>
+        <table>
+            <tr th:each="characteristic: ${product.characteristics}">
+                <td>
+                    <p th:text="${characteristic.name} + ' ' + ${characteristic.characteristicValue}"></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div>
+        <table>
+            <tr th:each="shop: ${product.shops}">
+                <td>
+                    <img th:src="@{${shop.imgLocation}}" th:alt="${shop.imgLocation}">
+                    <p th:text="${shop.name}"></p>
+                    <p th:text="${shop.link}"></p>
+                    <p th:text="'Score ' + ${shop.score}"></p>
+                    <p th:text="'Price ' + ${shop.price}"></p>
+                    <p th:text="'Reviews ' + ${shop.reviews}"></p>
+
+                    <form th:method="PUT" th:action="@{/products/{productId}/{shopId}(productId = ${product.productId}, shopId = ${shop.shopId})}">
+                        <input type="submit" value="Remove"/>
+                    </form>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>

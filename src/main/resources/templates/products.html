@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Products</title>
+</head>
+<body>
+    <div>
+        <a th:method="GET" th:href="@{/categories/{categoryId}/characteristic(categoryId = ${categoryId})}">Add characteristic</a>
+        <br>
+
+        <a th:method="GET" th:href="@{/products/{categoryId}/new(categoryId = ${categoryId})}">Add new product</a>
+        <br>
+
+        <a th:method="GET" th:href="@{/categories/{categoryId}/shops(categoryId = ${categoryId})}">Add shop to category</a>
+        <br>
+    </div>
+
+    <div>
+        <form th:method="GET" th:action="@{/categories/{categoryId}(categoryId = ${categoryId})}" th:object="${query}">
+
+            <input type="hidden" name="categoryId" th:value="${categoryId}">
+
+            <div th:each="characteristic: ${query.characteristics}">
+                <p th:text="${characteristic.name}"></p>
+
+                <div th:each="element: ${characteristic.values}">
+                    <label th:for="${element.value}" th:text="${element.value}"></label>
+                    <input type="checkbox" th:id="${element.value}" name="enabled" th:value="${true}">
+                </div>
+            </div>
+
+            <div>
+                <p>Sort by</p>
+                <label for="price">Price </label>
+                <input type="radio" th:field="*{sortingOption}" th:value="${T(com.marketplace.service.category.SortingOption).valueOf('PRICE')}" id="price"/>
+                <label for="reviews">Reviews </label>
+                <input type="radio" th:field="*{sortingOption}" th:value="${T(com.marketplace.service.category.SortingOption).valueOf('REVIEWS')}" id="reviews"/>
+                <label for="desc">DESC</label>
+                <input type="checkbox" id="DESC" th:field="*{orderDescending}" th:value="${true}">
+            </div>
+
+            <div>
+                <input type="submit" value="Search"/>
+            </div>
+        </form>
+    </div>
+
+    <div>
+        <div th:each="product: ${products}">
+            <img th:src="@{${product.imgLocation}}" th:alt="${product.imgLocation}">
+            <br>
+            <a th:method="GET" th:text="${product.name}" th:href="@{/products/{productId}(productId = ${product.productId})}"></a>
+            <br>
+            <span th:text="${product.minPrice}"></span>
+            <span th:unless="${product.minPrice} == ${product.maxPrice}" th:text="' - ' + ${product.maxPrice}"></span>
+            <br>
+            <span th:text="${product.totalReviews}"></span>
+        </div>
+    </div>
+
+    <div>
+        <form th:method="GET" th:action="@{/categories/{categoryId}(categoryId = ${categoryId})}" th:object="${list}">
+
+            <div>
+                <input type="hidden" th:field="*{currentPage}" th:value="${list.currentPage - 1}">
+                <input th:if="${list.firstPage}" type="submit"  value="previous" disabled="disabled">
+                <input th:unless="${list.firstPage}" type="submit"  value="previous">
+            </div>
+
+            <div th:each="page: ${list.pages}">
+                <input type="hidden" th:field="*{currentPage}" th:value="${page.key}">
+                <input type="submit" th:value="${page.key}">
+            </div>
+
+            <div>
+                <input type="hidden" th:field="*{currentPage}" th:value="${list.currentPage + 1}">
+                <input th:if="${list.lastPage}" type="submit"  value="next" disabled="disabled">
+                <input th:unless="${list.lastPage}" type="submit"  value="next">
+            </div>
+
+        </form>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Products</title>
+</head>
+<body>
+
+<div>
+    <form th:method="POST" th:action="@{/products}" th:object="${product}" enctype="multipart/form-data">
+        <input type="hidden" name="categoryId" th:value="${categoryId}">
+
+        <label for="name">Name</label>
+        <input type="text" th:field="*{name}" id="name">
+        <br>
+        <label for="image">Image</label>
+        <input type="file" id="image" name="imgFile" accept="image/*">
+
+        <div th:each="characteristic, charStat: ${product.characteristics}">
+            <p th:text="${characteristic.name}"></p>
+
+            <div th:each="option, detStat: ${characteristic.options}">
+<!--                <input hidden-->
+<!--                       th:name="|__characteristics[__${charStat.index}__].options__[__${detStat.index}__].name|"-->
+<!--                       th:value="${option.name}">-->
+
+<!--                <input hidden-->
+<!--                       th:name="|__characteristics[__${charStat.index}__].options__[__${detStat.index}__].characteristicId|"-->
+<!--                       th:value="${option.characteristicId}">-->
+
+<!--                <input hidden-->
+<!--                       th:name="|__characteristics[__${charStat.index}__].options__[__${detStat.index}__]|"-->
+<!--                       th:value="${option}">-->
+
+                <input type="checkbox" th:id="${option.name}"
+                       th:name="|characteristics[__${charStat.index}__].includedCharacteristic|"
+                       th:value="${option.characteristicId}">
+
+                <label th:for="${option.name}" th:text="${option.name}"></label>
+            </div>
+
+        </div>
+
+        <input type="submit" value="Add">
+    </form>
+</div>
+
+</body>
+</html>
